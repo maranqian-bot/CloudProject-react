@@ -1,6 +1,5 @@
-import { formatDate, formatDateOfWeek } from "../../utils/attendanceFormat";
+import { formatDate, formatDateOfWeek, formatTime, formatWorkMinutes } from "../../utils/attendanceFormat";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
-
 
 function AttendanceHistoryTable({ history }) {
 
@@ -42,17 +41,17 @@ function AttendanceHistoryTable({ history }) {
               <tr key={item.attendanceId}>
                 <td>
                     <div className="date-cell">
-                        <span className="date-primary">{formatDate(item.date)}</span>
-                        <span className="date-secondary">{formatDateOfWeek(item.date)}</span>
+                        <span className="date-primary">{formatDate(item.workDate)}</span>
+                        <span className="date-secondary">{formatDateOfWeek(item.workDate)}</span>
                     </div>
                     {item.date}
                 </td>
                 <td className="time-cell">{formatTime(item.checkInTime)}</td>
                 <td className="time-cell">{formatTime(item.checkOutTime)}</td>
-                <td className="time-cell">{formatWorkMinutes(item.workTime)}</td>
+                <td className="time-cell">{formatWorkMinutes(item.workMinutes)}</td>
                 <td className="text-center">
                   <span className="status-badge status-normal">
-                    <AttendanceStatusBadge status={item.status}/>
+                    <AttendanceStatusBadge status={item.attendanceStatus}/>
                   </span>
                 </td>
 
@@ -75,6 +74,7 @@ function AttendanceHistoryTable({ history }) {
 
         <div className="table-footer">
           <p className="footer-info">
+            {/* 전체 리스트는 history리스트 length구하면 되지않을까...? */}
             전체 308개의 근태 기록 중 1~5번째 표시 중
           </p>
           <div className="pagination">
