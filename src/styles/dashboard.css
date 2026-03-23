@@ -362,7 +362,7 @@ body {
 }
 
 /* Main Content */
-main {
+.main-dashboard, main {
     margin-left: var(--sidebar-width);
     padding: calc(var(--header-height) + 2rem) 2rem 3rem;
 }
@@ -873,7 +873,7 @@ tr:hover {
         left: 0;
     }
 
-    main {
+    .main-dashboard {
         margin-left: 0;
     }
 
