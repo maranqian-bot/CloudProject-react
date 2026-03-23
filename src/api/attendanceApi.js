@@ -10,7 +10,7 @@ import axiosInstance from "./axiosInstance"
 //     "absentCount": 1,
 //     "attendanceScore": 94.8
 // }
-export const getAttendanceSummary = async () => {
+export const getAttendanceSummaryApi = async () => {
     const response = await axiosInstance.get("/attendance/summary");
 
     return {
@@ -31,7 +31,7 @@ export const getAttendanceSummary = async () => {
 //     "workMinutes": "18:12",
 //     "attendanceStatus": "NORMAL"
 // }
-export const getAttendancHistory = async () => {
+export const getAttendancHistoryApi = async () => {
     const response = await axiosInstance.get("/attendance/history");
 
     return [
@@ -63,7 +63,7 @@ export const getAttendancHistory = async () => {
 }
 
 // 근태 엑셀 다운로드 api
-export const downloadAttendanceExcel = async () => {
+export const downloadAttendanceExcelApi = async () => {
     const response = await axiosInstance.get("/attendance/export", {
         responseType: "blob", // 파일 형태로 받음
     });

@@ -49,23 +49,23 @@ export const formatWorkMinutes = (minutes) => {
     return `${hour}시간 ${minute}분`;
 };
 
-// 상태값 한글 변환
-export const formatAttendanceStatus = (status) => {
-    switch(status) {
-        case "NORMAL":
-            return "정상";
-        case "LATE":
-            return "지각";
-        case "EARLYLEAVE":
-            return "조퇴";
-        case "VACATION":
-            return "휴가";
-        case "OVERTIME":
-            return "연장 근무";
-        default:
-            return status || "-";
-    }
-};
+// // 상태값 한글 변환
+// export const formatAttendanceStatus = (status) => {
+//     switch(status) {
+//         case "NORMAL":
+//             return "정상";
+//         case "LATE":
+//             return "지각";
+//         case "EARLYLEAVE":
+//             return "조퇴";
+//         case "VACATION":
+//             return "휴가";
+//         case "OVERTIME":
+//             return "연장 근무";
+//         default:
+//             return status || "-";
+//     }
+// };
 
 
 

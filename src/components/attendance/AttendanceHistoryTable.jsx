@@ -1,4 +1,5 @@
 import { formatDate, formatDateOfWeek } from "../../utils/attendanceFormat";
+import AttendanceStatusBadge from "./AttendanceStatusBadge";
 
 
 function AttendanceHistoryTable({ history }) {
@@ -51,7 +52,7 @@ function AttendanceHistoryTable({ history }) {
                 <td className="time-cell">{formatWorkMinutes(item.workTime)}</td>
                 <td className="text-center">
                   <span className="status-badge status-normal">
-                    {formatAttendanceStatus(item.status)}
+                    <AttendanceStatusBadge status={item.status}/>
                   </span>
                 </td>
 
