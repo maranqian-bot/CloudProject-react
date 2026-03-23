@@ -362,7 +362,7 @@ body {
 }
 
 /* Main Content */
-main {
+.main-dashboard, main {
     margin-left: var(--sidebar-width);
     padding: calc(var(--header-height) + 2rem) 2rem 3rem;
 }
@@ -873,7 +873,7 @@ tr:hover {
         left: 0;
     }
 
-    main {
+    .main-dashboard {
         margin-left: 0;
     }
 
@@ -2401,3 +2401,4 @@ footer {
 /* Login */
 
 
+>>>>>>> 3196c2ff7b8d7a046f70b2b18f27ea96bc47dd39
