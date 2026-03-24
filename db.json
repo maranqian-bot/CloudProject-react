@@ -1,0 +1,45 @@
+{
+  "summary": [
+    {
+      "id": 1,
+      "workDays": 20,
+      "lateCount": 2,
+      "absentCount": 1,
+      "attendanceScore": 94.8
+    }
+  ],
+  "history": [
+    {
+      "id": 1,
+      "workDate": "2026-03-23",
+      "checkInTime": "09:00",
+      "checkOutTime": "18:30",
+      "workMinutes": 570,
+      "attendanceStatus": "NORMAL"
+    },
+    {
+      "id": 2,
+      "workDate": "2026-03-22",
+      "checkInTime": "09:15",
+      "checkOutTime": "18:10",
+      "workMinutes": 535,
+      "attendanceStatus": "LATE"
+    },
+    {
+      "id": 3,
+      "workDate": "2026-03-21",
+      "checkInTime": "09:00",
+      "checkOutTime": "17:00",
+      "workMinutes": 480,
+      "attendanceStatus": "EARLYLEAVE"
+    },
+    {
+      "id": 4,
+      "workDate": "2026-03-20",
+      "checkInTime": null,
+      "checkOutTime": null,
+      "workMinutes": null,
+      "attendanceStatus": "OVERTIME"
+    }
+  ]
+}
