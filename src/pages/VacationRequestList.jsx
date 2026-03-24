@@ -3,7 +3,43 @@ import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/vacation-request-list.css?inline";
 
+import { useVacationRequestList } from "../hooks/useVacationRequestList";
+import {
+    TYPE_TABS,
+    getStatusLabel,
+    getStatusClass,
+    getAvatarText,
+    formatDateRange,
+    formatDays,
+} from "../utils/vacationRequestUtils";
+
 function VacationRequestList() {
+    // 휴가 신청 목록 / 통계 / 페이지네이션 관련 커스텀 훅 호출
+    const {
+        activeType,
+        setActiveType,
+        filteredList,
+        currentPageData,
+        currentPage,
+        totalPages,
+        startItemNumber,
+        endItemNumber,
+        pendingCount,
+        approvedCount,
+        rejectedCount,
+        monthlyVacationCount,
+        isLoading,
+        isError,
+        error,
+        handleApprove,
+        handleReject,
+        goToPage,
+        goToPrevPage,
+        goToNextPage,
+        isApproving,
+        isRejecting,
+    } = useVacationRequestList();
+
     return (
         <>
             <Sidebar />
@@ -37,20 +73,24 @@ function VacationRequestList() {
                         <div className="stat-card">
                             <p className="stat-label">대기</p>
                             <div className="stat-value">
-                                <span className="stat-number trend-blue">12</span>
-                                <span className="stat-trend trend-blue">+2 New</span>
+                                <span className="stat-number trend-blue">
+                                    {String(pendingCount).padStart(2, "0")}
+                                </span>
+                                <span className="stat-trend trend-blue">{pendingCount}건</span>
                             </div>
                         </div>
 
                         <div className="stat-card">
                             <p className="stat-label">승인</p>
                             <div className="stat-value">
-                                <span className="stat-number">05</span>
+                                <span className="stat-number">
+                                    {String(approvedCount).padStart(2, "0")}
+                                </span>
                                 <span
                                     className="stat-trend"
                                     style={{ color: "var(--on-surface-variant)" }}
                                 >
-                                    명
+                                    건
                                 </span>
                             </div>
                         </div>
@@ -58,12 +98,14 @@ function VacationRequestList() {
                         <div className="stat-card">
                             <p className="stat-label">반려</p>
                             <div className="stat-value">
-                                <span className="stat-number">05</span>
+                                <span className="stat-number">
+                                    {String(rejectedCount).padStart(2, "0")}
+                                </span>
                                 <span
                                     className="stat-trend"
                                     style={{ color: "var(--on-surface-variant)" }}
                                 >
-                                    명
+                                    건
                                 </span>
                             </div>
                         </div>
@@ -71,7 +113,9 @@ function VacationRequestList() {
                         <div className="stat-card">
                             <p className="stat-label">이번 달 휴가 인원</p>
                             <div className="stat-value">
-                                <span className="stat-number">05</span>
+                                <span className="stat-number">
+                                    {String(monthlyVacationCount).padStart(2, "0")}
+                                </span>
                                 <span
                                     className="stat-trend"
                                     style={{ color: "var(--on-surface-variant)" }}
@@ -85,23 +129,21 @@ function VacationRequestList() {
                     <div className="table-container">
                         <div className="table-header">
                             <div className="tabs">
-                                <button className="tab active" type="button">
-                                    전체 목록
-                                </button>
-                                <button className="tab" type="button">
-                                    교육
-                                </button>
-                                <button className="tab" type="button">
-                                    병가
-                                </button>
-                                <button className="tab" type="button">
-                                    경조사
-                                </button>
-                                <button className="tab" type="button">
-                                    기타
-                                </button>
+                                {/* 휴가 유형 탭 렌더링 */}
+                                {TYPE_TABS.map((tab) => (
+                                    <button
+                                        key={tab.value}
+                                        className={`tab ${activeType === tab.value ? "active" : ""}`}
+                                        type="button"
+                                        onClick={() => setActiveType(tab.value)}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
                             </div>
-                            <p className="total-count">총 24건의 요청</p>
+
+                            {/* 현재 필터링된 전체 요청 건수 표시 */}
+                            <p className="total-count">총 {filteredList.length}건의 요청</p>
                         </div>
 
                         <table>
@@ -116,199 +158,118 @@ function VacationRequestList() {
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div className="avatar">IS</div>
-                                            <div>
-                                                <p className="user-name">이수진</p>
-                                                <p className="user-sub">개발팀 · 선임</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-text">연차 유급 휴가</span>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
-                                            <p className="date">2024.06.12 - 2024.06.14</p>
-                                            <p className="duration">3일간 (평일 기준)</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-pending">대기</span>
-                                    </td>
-                                    <td>
-                                        <div className="action-group">
-                                            <button className="btn-sm btn-approve" type="button">
-                                                승인
-                                            </button>
-                                            <button className="btn-sm btn-reject" type="button">
-                                                반려
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {/* 로딩 상태 */}
+                                {isLoading ? (
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            style={{ textAlign: "center", padding: "40px" }}
+                                        >
+                                            데이터를 불러오는 중입니다...
+                                        </td>
+                                    </tr>
+                                ) : isError ? (
+                                    /* 에러 상태 */
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            style={{ textAlign: "center", padding: "40px" }}
+                                        >
+                                            데이터를 불러오지 못했습니다.
+                                            {error?.message ? ` (${error.message})` : ""}
+                                        </td>
+                                    </tr>
+                                ) : currentPageData.length === 0 ? (
+                                    /* 빈 데이터 상태 */
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            style={{ textAlign: "center", padding: "40px" }}
+                                        >
+                                            신청 내역이 없습니다.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    /* 현재 페이지 데이터 렌더링 */
+                                    currentPageData.map((item) => (
+                                        <tr key={item.id}>
+                                            <td>
+                                                <div className="user-cell">
+                                                    <div className="avatar">
+                                                        {getAvatarText(item.employeeName)}
+                                                    </div>
+                                                    <div>
+                                                        <p className="user-name">{item.employeeName}</p>
+                                                        <p className="user-sub">
+                                                            {item.departmentName} · {item.position}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
 
-                                <tr>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div
-                                                className="avatar"
-                                                style={{
-                                                    backgroundColor: "#f1f5f9",
-                                                    color: "#64748b",
-                                                }}
-                                            >
-                                                PH
-                                            </div>
-                                            <div>
-                                                <p className="user-name">박현우</p>
-                                                <p className="user-sub">디자인팀 · 책임</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-text">오전 반차</span>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
-                                            <p className="date">2024.06.10</p>
-                                            <p className="duration">0.5일</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-approved">승인</span>
-                                    </td>
-                                    <td>
-                                        <div className="action-group">
-                                            <button className="btn-sm btn-approve" type="button">
-                                                승인
-                                            </button>
-                                            <button className="btn-sm btn-reject" type="button">
-                                                반려
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            <td>
+                                                <span className="type-text">{item.vacationType}</span>
+                                            </td>
 
-                                <tr>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div
-                                                className="avatar"
-                                                style={{
-                                                    backgroundColor: "#f1f5f9",
-                                                    color: "#64748b",
-                                                }}
-                                            >
-                                                KM
-                                            </div>
-                                            <div>
-                                                <p className="user-name">강민호</p>
-                                                <p className="user-sub">기획팀 · 주임</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-text">병가 (기타)</span>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
-                                            <p className="date">2024.06.07</p>
-                                            <p className="duration">1일간</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-rejected">반려</span>
-                                    </td>
-                                    <td>
-                                        <div className="action-group">
-                                            <button className="btn-sm btn-approve" type="button">
-                                                승인
-                                            </button>
-                                            <button className="btn-sm btn-reject" type="button">
-                                                반려
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            <td>
+                                                <div className="date-info">
+                                                    <p className="date">
+                                                        {formatDateRange(
+                                                            item.startDate,
+                                                            item.endDate
+                                                        )}
+                                                    </p>
+                                                    <p className="duration">{formatDays(item.days)}</p>
+                                                </div>
+                                            </td>
 
-                                <tr>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div
-                                                className="avatar"
-                                                style={{
-                                                    backgroundColor: "#f1f5f9",
-                                                    color: "#64748b",
-                                                }}
-                                            >
-                                                KM
-                                            </div>
-                                            <div>
-                                                <p className="user-name">강민호</p>
-                                                <p className="user-sub">기획팀 · 주임</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-text">병가 (기타)</span>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
-                                            <p className="date">2024.06.07</p>
-                                            <p className="duration">1일간</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-rejected">반려</span>
-                                    </td>
-                                    <td>
-                                        <div className="action-group">
-                                            <button className="btn-sm btn-approve" type="button">
-                                                승인
-                                            </button>
-                                            <button className="btn-sm btn-reject" type="button">
-                                                반려
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            <td>
+                                                <span className={getStatusClass(item.status)}>
+                                                    {getStatusLabel(item.status)}
+                                                </span>
+                                            </td>
 
-                                <tr>
-                                    <td>
-                                        <div className="user-cell">
-                                            <div className="avatar">CY</div>
-                                            <div>
-                                                <p className="user-name">최윤아</p>
-                                                <p className="user-sub">마케팅팀 · 사원</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="type-text">경조사 휴가</span>
-                                    </td>
-                                    <td>
-                                        <div className="date-info">
-                                            <p className="date">2024.06.18 - 2024.06.20</p>
-                                            <p className="duration">3일간</p>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="badge badge-pending">대기</span>
-                                    </td>
-                                    <td>
-                                        <div className="action-group">
-                                            <button className="btn-sm btn-approve" type="button">
-                                                승인
-                                            </button>
-                                            <button className="btn-sm btn-reject" type="button">
-                                                반려
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            <td>
+                                                <div className="action-group">
+                                                    {/* 승인 버튼 */}
+                                                    <button
+                                                        className="btn-sm btn-approve"
+                                                        type="button"
+                                                        onClick={() => handleApprove(item.id)}
+                                                        disabled={isApproving || isRejecting}
+                                                    >
+                                                        승인
+                                                    </button>
+
+                                                    {/* 반려 버튼 */}
+                                                    <button
+                                                        className="btn-sm btn-reject"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            // 반려 사유 입력창 표시
+                                                            const rejectReason = window.prompt(
+                                                                "반려 사유를 입력하세요.",
+                                                                "관리자 반려"
+                                                            );
+
+                                                            // 취소 버튼 클릭 시 종료
+                                                            if (rejectReason === null) return;
+
+                                                            // 입력값이 비어 있으면 기본 문구 사용
+                                                            handleReject(
+                                                                item.id,
+                                                                rejectReason.trim() || "관리자 반려"
+                                                            );
+                                                        }}
+                                                        disabled={isApproving || isRejecting}
+                                                    >
+                                                        반려
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
 
@@ -321,11 +282,18 @@ function VacationRequestList() {
                                     color: "var(--on-surface-variant)",
                                 }}
                             >
-                                전체 인원 12명 중 1~5번째 표시 중
+                                전체 요청 {filteredList.length}건 중 {startItemNumber}~
+                                {endItemNumber}번째 표시 중
                             </p>
 
                             <div className="pagination">
-                                <button className="page-btn" type="button">
+                                {/* 이전 페이지 버튼 */}
+                                <button
+                                    className="page-btn"
+                                    type="button"
+                                    onClick={goToPrevPage}
+                                    disabled={currentPage === 1}
+                                >
                                     <span
                                         className="material-symbols-outlined"
                                         style={{ fontSize: "16px" }}
@@ -333,16 +301,30 @@ function VacationRequestList() {
                                         chevron_left
                                     </span>
                                 </button>
-                                <button className="page-btn active" type="button">
-                                    1
-                                </button>
-                                <button className="page-btn" type="button">
-                                    2
-                                </button>
-                                <button className="page-btn" type="button">
-                                    3
-                                </button>
-                                <button className="page-btn" type="button">
+
+                                {/* 페이지 번호 버튼 */}
+                                {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                                    (page) => (
+                                        <button
+                                            key={page}
+                                            className={`page-btn ${
+                                                currentPage === page ? "active" : ""
+                                            }`}
+                                            type="button"
+                                            onClick={() => goToPage(page)}
+                                        >
+                                            {page}
+                                        </button>
+                                    )
+                                )}
+
+                                {/* 다음 페이지 버튼 */}
+                                <button
+                                    className="page-btn"
+                                    type="button"
+                                    onClick={goToNextPage}
+                                    disabled={currentPage === totalPages}
+                                >
                                     <span
                                         className="material-symbols-outlined"
                                         style={{ fontSize: "16px" }}
@@ -367,9 +349,12 @@ function VacationRequestList() {
                     </div>
                 </div>
             </main>
-
         </>
-    )
+    );
 }
 
-export default withPageStyle(VacationRequestList, "vacation-request-list.css", pageCss);
+export default withPageStyle(
+    VacationRequestList,
+    "vacation-request-list.css",
+    pageCss
+);

@@ -56,11 +56,11 @@
       "endDate": "2026-03-27",
       "days": 2,
       "reason": "직무 교육 참석",
-      "status": "PENDING",
-      "approvedAt": null,
+      "status": "APPROVED",
+      "approvedAt": "2026-03-24T14:37:43.853Z",
       "rejectReason": null,
-      "approverId": null,
-      "approverName": null
+      "approverId": 9001,
+      "approverName": "김관리"
     },
     {
       "id": 2,
@@ -76,7 +76,7 @@
       "days": 0.5,
       "reason": "병원 진료",
       "status": "APPROVED",
-      "approvedAt": "2026-03-21T15:20:00",
+      "approvedAt": "2026-03-24T14:37:42.841Z",
       "rejectReason": null,
       "approverId": 9001,
       "approverName": "김관리"
@@ -94,9 +94,9 @@
       "endDate": "2026-03-20",
       "days": 1,
       "reason": "개인 사유",
-      "status": "REJECTED",
-      "approvedAt": null,
-      "rejectReason": "업무 일정 충돌",
+      "status": "APPROVED",
+      "approvedAt": "2026-03-24T14:37:40.082Z",
+      "rejectReason": null,
       "approverId": 9001,
       "approverName": "김관리"
     },
@@ -113,11 +113,11 @@
       "endDate": "2026-03-30",
       "days": 3,
       "reason": "가족 행사",
-      "status": "PENDING",
-      "approvedAt": null,
+      "status": "APPROVED",
+      "approvedAt": "2026-03-24T14:37:41.917Z",
       "rejectReason": null,
-      "approverId": null,
-      "approverName": null
+      "approverId": 9001,
+      "approverName": "김관리"
     }
   ]
 }
