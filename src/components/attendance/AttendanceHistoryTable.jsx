@@ -1,8 +1,24 @@
-import { formatDate, formatDateOfWeek, formatTime, formatWorkMinutes } from "../../utils/attendanceFormat";
+import {
+  formatDate,
+  formatDateOfWeek,
+  formatTime,
+  formatWorkMinutes,
+} from "../../utils/attendanceFormat";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
 
-function AttendanceHistoryTable({ history }) {
-
+function AttendanceHistoryTable({
+  history = [],
+  totalCount = 0,
+  startItemNumber = 0,
+  endItemNumber = 0,
+  currentPage = 1,
+  totalPages = 1,
+  pageNumbers = [],
+  goToPage,
+  goToPrevPage,
+  goToNextPage,
+  onExcelExport,
+}) {
   return (
     <div className="table-container">
       <div className="table-header">
@@ -11,7 +27,7 @@ function AttendanceHistoryTable({ history }) {
           <p>현재 정산 주기의 이력 데이터입니다.</p>
         </div>
         <div className="header-actions">
-          <button className="btn-dark">
+          <button className="btn-dark" onClick={onExcelExport}>
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 16 }}
@@ -23,7 +39,6 @@ function AttendanceHistoryTable({ history }) {
         </div>
       </div>
 
-
       <div style={{ overflowX: "auto" }}>
         <table>
           <thead>
@@ -33,58 +48,87 @@ function AttendanceHistoryTable({ history }) {
               <th>퇴근 시각</th>
               <th>근무 시간</th>
               <th className="text-center">상태</th>
-              <th className="text-right">관리</th>  
+              <th className="text-right">관리</th>
             </tr>
           </thead>
           <tbody>
-            {history?.map((item) => (
-              <tr key={item.attendanceId}>
-                <td>
+            {history?.length > 0 ? (
+              history.map((item) => (
+                <tr key={item.id}>
+                  <td>
                     <div className="date-cell">
-                        <span className="date-primary">{formatDate(item.workDate)}</span>
-                        <span className="date-secondary">{formatDateOfWeek(item.workDate)}</span>
+                      <span className="date-primary">
+                        {formatDate(item.workDate)}
+                      </span>
+                      <span className="date-secondary">
+                        {formatDateOfWeek(item.workDate)}
+                      </span>
                     </div>
-                    {item.date}
-                </td>
-                <td className="time-cell">{formatTime(item.checkInTime)}</td>
-                <td className="time-cell">{formatTime(item.checkOutTime)}</td>
-                <td className="time-cell">{formatWorkMinutes(item.workMinutes)}</td>
-                <td className="text-center">
-                  <span className="status-badge status-normal">
-                    <AttendanceStatusBadge status={item.attendanceStatus}/>
-                  </span>
-                </td>
+                  </td>
 
+                  <td className="time-cell">{formatTime(item.checkInTime)}</td>
+                  <td className="time-cell">{formatTime(item.checkOutTime)}</td>
+                  <td className="time-cell">
+                    {formatWorkMinutes(item.workMinutes)}
+                  </td>
 
-                <td className="text-right">
-                  <button className="btn-icon">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 18 }}
-                    >
-                      more_vert
-                    </span>
-                  </button>
+                  <td className="text-center">
+                    <AttendanceStatusBadge status={item.attendanceStatus} />
+                  </td>
+
+                  <td className="text-right">
+                    <button className="btn-icon">
+                      <span
+                        className="material-symbols-outlined"
+                        style={{ fontSize: 18 }}
+                      >
+                        more_vert
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  근태 이력이 없습니다.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-
 
         <div className="table-footer">
           <p className="footer-info">
             {/* 전체 리스트는 history리스트 length구하면 되지않을까...? */}
-            전체 308개의 근태 기록 중 1~5번째 표시 중
+            전체 {totalCount}개의 근태 기록 중 {startItemNumber}~{endItemNumber}
+            번째 표시 중
           </p>
+
           <div className="pagination">
-            <button className="page-btn">
+            <button
+              className="page-btn"
+              onClick={goToPrevPage}
+              disabled={currentPage === 1}
+            >
               <span className="material-symbols-outlined">chevron_left</span>
             </button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
-            <button className="page-btn">
+
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                className={`page-btn ${currentPage === pageNumber ? "active" : ""}`}
+                onClick={() => goToPage(pageNumber)}
+              >
+                {pageNumber}
+              </button>
+            ))}
+
+            <button
+              className="page-btn"
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages || totalPages === 0}
+            >
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
           </div>

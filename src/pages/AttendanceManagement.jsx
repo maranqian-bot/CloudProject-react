@@ -9,6 +9,7 @@ import {
   useAttendanceSummaryQuery,
 } from "../query/attendanceQuery";
 import AttendanceHistoryTable from "../components/attendance/AttendanceHistoryTable";
+import { usePagination } from "../hooks/usePagination.js";
 
 function AttendanceManagement() {
   // TODO : 백엔드 구현 후 query 호출해야 됨
@@ -18,68 +19,37 @@ function AttendanceManagement() {
   //      : 상태뱃지 스타일 적용 해야 됨
   //      : 근태 관리 상승률과 하락률 계산해서 적용해야 됨 (시간남으면..)
 
-  //   const {
-  //     data: summaryData,
-  //     isLoading: summaryLoading,
-  //     isError: summaryError,
-  //   } = useAttendanceSummaryQuery();
+  const {
+    data: summaryData,
+    isLoading: summaryLoading,
+    isError: summaryError,
+  } = useAttendanceSummaryQuery();
 
-  //   const {
-  //     data: historyData,
-  //     isLoading: historyLoading,
-  //     isError: historyError,
-  //   } = useAttendanceHistoryQuery();
-  // 더미 요약 데이터
-  const summaryData = {
-    workDays: 20,
-    lateCount: 2,
-    absentCount: 1,
-    attendanceScore: 94.8,
-  };
+  const {
+    data: historyData = [],
+    isLoading: historyLoading,
+    isError: historyError,
+  } = useAttendanceHistoryQuery();
 
-  // 더미 이력 데이터
-  const historyData = [
-    {
-      attendanceId: 1,
-      workDate: "2026-03-23",
-      checkInTime: "09:00",
-      checkOutTime: "18:30",
-      workMinutes: 340,
-      attendanceStatus: "NORMAL",
-    },
-    {
-      attendanceId: 2,
-      workDate: "2026-03-22",
-      checkInTime: "09:15",
-      checkOutTime: "18:10",
-      workMinutes: 340,
-      attendanceStatus: "LATE",
-    },
-    {
-      attendanceId: 3,
-      workDate: "2026-03-21",
-      checkInTime: "09:00",
-      checkOutTime: "17:00",
-      workMinutes: 340,
-      attendanceStatus: "EARLYLEAVE",
-    },
-    {
-      attendanceId: 4,
-      workDate: "2026-03-20",
-      checkInTime: null,
-      checkOutTime: null,
-      workMinutes: 340,
-      attendanceStatus: "OVERTIME",
-    },
-  ];
+  // 페이지 훅 호출
+  const {
+    currentPage,
+    totalPages,
+    currentData,
+    pageNumbers,
+    startItemNumber,
+    endItemNumber,
+    goToPage,
+    goToPrevPage,
+    goToNextPage,
+  } = usePagination(historyData, 5, 3);
 
-//   if (summaryLoading || historyLoading) {
-//     return <div>로딩 중...</div>;
-//   }
-
-//   if (summaryError || historyError) {
-//     return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
-//   }
+  if (summaryLoading || historyLoading) {
+    return <div>로딩 중...</div>;
+  }
+  if (summaryError || historyError) {
+    return <div>데이터를 불러오는 중 오류가 발생했습니다.</div>;
+  }
 
   return (
     <>
@@ -98,8 +68,20 @@ function AttendanceManagement() {
           </div>
         </div>
         <div className="content-canvas">
-          <AttendanceSummaryCards summary={summaryData} />
-          <AttendanceHistoryTable history={historyData} />
+          <AttendanceSummaryCards summary={summaryData || {}} />
+          <AttendanceHistoryTable
+            history={historyData}
+            totalCount={historyData.length}
+            startItemNumber={startItemNumber}
+            endItemNumber={endItemNumber}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageNumbers={pageNumbers}
+            goToPage={goToPage}
+            goToPrevPage={goToPrevPage}
+            goToNextPage={goToNextPage}
+            onExcelExport={() => console.log("엑셀 내보내기")}
+          />
         </div>
       </main>
     </>

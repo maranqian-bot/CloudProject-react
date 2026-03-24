@@ -1,0 +1,30 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-arrow,
+.page-button {
+  min-width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.page-arrow:disabled,
+.page-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page-button.active {
+  background-color: #0f62fe;
+  color: #ffffff;
+  font-weight: 700;
+}

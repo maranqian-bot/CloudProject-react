@@ -12,13 +12,7 @@ import axiosInstance from "./axiosInstance"
 // }
 export const getAttendanceSummaryApi = async () => {
     const response = await axiosInstance.get("/attendance/summary");
-
-    return {
-        workDays: 22,
-        lateCount: 3,
-        absentCount: 1,
-        attendanceScore: 94.8,
-    };
+    return response.data[0];
 };
 
 // 근태 이력 조회용 api(더미)
@@ -33,33 +27,7 @@ export const getAttendanceSummaryApi = async () => {
 // }
 export const getAttendancHistoryApi = async () => {
     const response = await axiosInstance.get("/attendance/history");
-
-    return [
-    {
-      attendanceId: 1,
-      date: "2023-10-24",
-      checkIn: "08:54",
-      checkOut: "18:12",
-      workMinutes: 558,
-      status: "NORMAL",
-    },
-    {
-      attendanceId: 2,
-      date: "2023-10-23",
-      checkIn: "09:42",
-      checkOut: "18:05",
-      workMinutes: 503,
-      status: "LATE",
-    },
-    {
-      attendanceId: 3,
-      date: "2023-10-22",
-      checkIn: "08:50",
-      checkOut: "20:30",
-      workMinutes: 700,
-      status: "OVERTIME",
-    },
-  ];
+    return response.data;
 }
 
 // 근태 엑셀 다운로드 api
@@ -67,6 +35,5 @@ export const downloadAttendanceExcelApi = async () => {
     const response = await axiosInstance.get("/attendance/export", {
         responseType: "blob", // 파일 형태로 받음
     });
-
     return response.data;
 }
