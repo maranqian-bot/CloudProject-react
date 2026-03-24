@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 
 
 const AttendanceStatusBadge = ({ status }) => {
@@ -17,7 +16,7 @@ const AttendanceStatusBadge = ({ status }) => {
     return (
         <span style={{display: "inline-block",
                       padding: "4px 10px",
-                      borderRedius: "999px",
+                      borderRadius: "999px",
                       fontSize: "12px",
                       fontWeight: "600",
                       color: current.color,

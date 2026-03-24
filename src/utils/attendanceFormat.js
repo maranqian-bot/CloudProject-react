@@ -7,7 +7,7 @@ export const formatDate = (dateString) => {
 
     const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = date.getMonth();
+    const month = date.getMonth() + 1;
     const day =  date.getDate();
 
     return `${year}년 ${month}월 ${day}일`;
@@ -28,15 +28,53 @@ export const formatDateOfWeek = (dateString) => {
 export const formatTime = (time) => {
     if (!time) return "-";
 
-    const [hour, minute] = time.split(":");
-    let h = parseInt(hour, 10);
+    let hour, minute;
 
-    const period = h >= 12 ? "PM" : "AM";
+    try {
+        // 1. 문자열일 때
+        if (typeof time === "string") {
 
-    h = h % 12;
-    if (h === 0) h = 12;
+            // ISO형식일 때 (2026-03-24T09:15:00)
+            if (time.includes("T")) {
+                const date = new Date(time);
+                hour = date.getHours();
+                minute = date.getMinutes();
+            } else {
+                // "HH:mm" "HH:mm:ss"
+                const parts = time.split(":");
 
-    return `${h}:${minute} ${period}`;
+                if (parts.length < 2) return "-";
+
+                hour = parseInt(parts[0], 10);
+                minute = parseInt(parts[1], 10);
+            }
+        }
+
+        // 2. Date 객체일 경우
+        else if (time instanceof Date) {
+            hour = time.getHours();
+            minute = time.getMinutes();
+        } else {
+            return "-";
+        }
+
+        // 3. 숫자 검증
+        if (isNaN(hour) || isNaN(minute)) return "-";
+
+        // 4. AM / PM 변환
+        const period = hour >= 12 ? "PM" : "AM";
+
+        let h = hour % 12;
+        if (h === 0) h = 12;
+
+        // 5. 분 두 자리 맞추기
+        const mm = minute.toString().padStart(2, "0");
+
+        return `${h}:${mm} ${period}`;
+         
+    } catch (e) {
+        return "-";
+    }
 };
 
 // 분 -> 9시간 18분 변환

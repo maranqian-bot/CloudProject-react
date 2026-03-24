@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
-import { getAttendanceSummaryApi, getAttendancHistoryApi } from "../api/attendanceApi"
+import { getAttendanceSummaryApi, getAttendanceHistoryApi } from "../api/attendanceApi"
 
 
 // 요약 조회 query
 export const useAttendanceSummaryQuery = () => {
     return useQuery({
-        queryKey: ["attendanceSummery"],
+        queryKey: ["attendanceSummary"],
         queryFn: getAttendanceSummaryApi, 
     });
 };
@@ -14,6 +14,6 @@ export const useAttendanceSummaryQuery = () => {
 export const useAttendanceHistoryQuery = () => {
     return useQuery({
         queryKey: ["attendanceHistory"],
-        queryFn: getAttendancHistoryApi,
+        queryFn: getAttendanceHistoryApi,
     });
 };

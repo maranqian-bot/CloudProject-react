@@ -3,6 +3,9 @@ import axiosInstance from "./axiosInstance"
 // 여기에서는 서버 통신만 하는 게 좋음 ui로직 xxxx
 
 // 근태 요약 조회용 api
+
+
+
 // JSON
 // {
 //     "workDays": 22,
@@ -20,12 +23,12 @@ export const getAttendanceSummaryApi = async () => {
 // {
 //     "attendanceId": 1,
 //     "workDate": "2023-10-24",
-//     "checkInTime": "THU",
-//     "chekcOutTime": "08:54",
-//     "workMinutes": "18:12",
+//     "checkInTime": "09:00",
+//     "chekcOutTime": "18:30",
+//     "workMinutes": 570,
 //     "attendanceStatus": "NORMAL"
 // }
-export const getAttendancHistoryApi = async () => {
+export const getAttendanceHistoryApi = async () => {
     const response = await axiosInstance.get("/attendance/history");
     return response.data;
 }

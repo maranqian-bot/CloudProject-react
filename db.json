@@ -14,7 +14,7 @@
       "workDate": "2026-03-23",
       "checkInTime": "09:00",
       "checkOutTime": "18:30",
-      "workMinutes": 340,
+      "workMinutes": 570,
       "attendanceStatus": "NORMAL"
     },
     {
@@ -22,7 +22,7 @@
       "workDate": "2026-03-22",
       "checkInTime": "09:15",
       "checkOutTime": "18:10",
-      "workMinutes": 340,
+      "workMinutes": 535,
       "attendanceStatus": "LATE"
     },
     {
@@ -30,7 +30,7 @@
       "workDate": "2026-03-21",
       "checkInTime": "09:00",
       "checkOutTime": "17:00",
-      "workMinutes": 340,
+      "workMinutes": 480,
       "attendanceStatus": "EARLYLEAVE"
     },
     {
@@ -38,7 +38,7 @@
       "workDate": "2026-03-20",
       "checkInTime": null,
       "checkOutTime": null,
-      "workMinutes": 340,
+      "workMinutes": null,
       "attendanceStatus": "OVERTIME"
     }
   ]
