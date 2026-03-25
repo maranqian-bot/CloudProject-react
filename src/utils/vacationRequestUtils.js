@@ -6,24 +6,27 @@ export const TYPE_TABS = [
     { label: "기타", value: "기타" },
 ];
 
-export const STATUS_LABEL_MAP = {
-    PENDING: "대기",
-    APPROVED: "승인",
-    REJECTED: "반려",
-};
-
-export const STATUS_CLASS_MAP = {
-    PENDING: "badge badge-pending",
-    APPROVED: "badge badge-approved",
-    REJECTED: "badge badge-rejected",
+export const STATUS = {
+    PENDING: {
+        label: "대기",
+        className: "badge badge-pending",
+    },
+    APPROVED: {
+        label: "승인",
+        className: "badge badge-approved",
+    },
+    REJECTED: {
+        label: "반려",
+        className: "badge badge-rejected",
+    },
 };
 
 export const getStatusLabel = (status) => {
-    return STATUS_LABEL_MAP[status] ?? status;
+    return STATUS[status]?.label ?? status;
 };
 
 export const getStatusClass = (status) => {
-    return STATUS_CLASS_MAP[status] ?? "badge";
+    return STATUS[status]?.className ?? "badge";
 };
 
 export const getAvatarText = (employeeName) => {
@@ -31,12 +34,19 @@ export const getAvatarText = (employeeName) => {
     return employeeName.slice(0, 2).toUpperCase();
 };
 
-const formatDate = (date) => date?.replaceAll("-", ".");
+const formatDate = (date) => {
+    if (typeof date !== "string" || !date.trim()) return "-";
+    return date.replaceAll("-", ".");
+};
 
 export const formatDateRange = (startDate, endDate) => {
     if (!startDate) return "-";
-    if (!endDate || startDate === endDate) return formatDate(startDate);
-    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+
+    if (!endDate || startDate === endDate) return formattedStartDate;
+    return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 export const formatDays = (days) => {
