@@ -19,7 +19,7 @@ export const getAttendanceSummaryApi = async () => {
         return response.data;
     } catch(e) {
         console.error(e);
-        return null;
+        throw e;
     }
 };
 
@@ -39,19 +39,19 @@ export const getAttendanceHistoryApi = async () => {
         return response.data;
     } catch(e) {
         console.error(e);
-        return null;
+        throw e;
     }
 }
 
 // 근태 엑셀 다운로드 api
 export const downloadAttendanceExcelApi = async () => {
     try {
-        const response = await axiosInstance.get("/attendance/export", {
+        const response = await axiosInstance.get("/api/employees/1/attendance/excel", {
             responseType: "blob", // 파일 형태로 받음
         });
         return response.data;
     } catch(e) {
         console.error(e);
-        return null;
+        throw e;
     }
 }
