@@ -101,6 +101,7 @@ export const useVacationRequestList = () => {
         setActiveType: handleChangeType,
         filteredList: viewModel.filteredList,
         currentPageData: viewModel.currentPageData,
+        totalCount: viewModel.totalCount,
         currentPage: viewModel.safeCurrentPage,
         totalPages: viewModel.totalPages,
         startItemNumber: viewModel.startItemNumber,
