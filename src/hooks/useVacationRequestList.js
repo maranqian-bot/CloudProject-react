@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     useApproveVacationRequestMutation,
     useRejectVacationRequestMutation,
     useVacationRequestListQuery,
+    useVacationRequestSummaryQuery,
 } from "../query/vacationQuery";
 
 export const useVacationRequestList = () => {
@@ -12,64 +13,60 @@ export const useVacationRequestList = () => {
     const itemsPerPage = 5;
 
     const {
-        data: list = [],
-        isLoading,
-        isError,
-        error,
-    } = useVacationRequestListQuery(currentPage);
+        data: listData = { items: [], totalCount: 0 },
+        isLoading: isListLoading,
+        isError: isListError,
+        error: listError,
+    } = useVacationRequestListQuery({
+        page: currentPage,
+        limit: itemsPerPage,
+        type: activeType,
+    });
+
+    const {
+        data: summaryData = {
+            pendingCount: 0,
+            approvedCount: 0,
+            rejectedCount: 0,
+            monthlyVacationCount: 0,
+        },
+        isLoading: isSummaryLoading,
+        isError: isSummaryError,
+        error: summaryError,
+    } = useVacationRequestSummaryQuery();
 
     const approveMutation = useApproveVacationRequestMutation();
     const rejectMutation = useRejectVacationRequestMutation();
 
-    const summary = useMemo(() => {
-        let pendingCount = 0;
-        let approvedCount = 0;
-        let rejectedCount = 0;
-
-        const employeeSet = new Set();
-
-        const now = new Date();
-        const currentMonth = `${now.getFullYear()}-${String(
-            now.getMonth() + 1
-        ).padStart(2, "0")}`;
-
-        const filteredList =
-            activeType === "ALL"
-                ? list
-                : list.filter((item) => item.vacationType === activeType);
-
-        for (const item of list) {
-            if (item.status === "PENDING") pendingCount++;
-            if (item.status === "APPROVED") approvedCount++;
-            if (item.status === "REJECTED") rejectedCount++;
-
-            if (item.startDate?.startsWith(currentMonth)) {
-                employeeSet.add(item.employeeId);
-            }
-        }
-
-        const totalPages = Math.ceil(filteredList.length / itemsPerPage) || 1;
+    const viewModel = useMemo(() => {
+        const currentPageData = listData.items ?? [];
+        const totalCount = listData.totalCount ?? 0;
+        const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
         const safeCurrentPage = Math.min(currentPage, totalPages);
-        const startIndex = (safeCurrentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const currentPageData = filteredList.slice(startIndex, endIndex);
 
-        const startItemNumber = filteredList.length === 0 ? 0 : startIndex + 1;
-        const endItemNumber = Math.min(endIndex, filteredList.length);
+        const startItemNumber = totalCount === 0 ? 0 : (safeCurrentPage - 1) * itemsPerPage + 1;
+        const endItemNumber = Math.min(safeCurrentPage * itemsPerPage, totalCount);
 
         return {
-            filteredList,
-            pendingCount,
-            approvedCount,
-            rejectedCount,
-            monthlyVacationCount: employeeSet.size,
-            totalPages,
+            filteredList: currentPageData,
             currentPageData,
+            totalCount,
+            totalPages,
+            safeCurrentPage,
             startItemNumber,
             endItemNumber,
-            safeCurrentPage,
+            pendingCount: summaryData.pendingCount,
+            approvedCount: summaryData.approvedCount,
+            rejectedCount: summaryData.rejectedCount,
+            monthlyVacationCount: summaryData.monthlyVacationCount,
         };
-    }, [list, activeType, currentPage]);
+    }, [listData, summaryData, currentPage]);
+
+    useEffect(() => {
+        if (currentPage !== viewModel.safeCurrentPage) {
+            setCurrentPage(viewModel.safeCurrentPage);
+        }
+    }, [currentPage, viewModel.safeCurrentPage]);
 
     const handleChangeType = (type) => {
         setActiveType(type);
@@ -85,40 +82,36 @@ export const useVacationRequestList = () => {
     };
 
     const goToNextPage = () => {
-        setCurrentPage((prev) => Math.min(prev + 1, summary.totalPages));
+        setCurrentPage((prev) => Math.min(prev + 1, viewModel.totalPages));
     };
 
     const handleApprove = (requestId) => {
-        approveMutation.mutate({
-            requestId,
-            page: currentPage,
-        });
+        approveMutation.mutate({ requestId });
     };
 
     const handleReject = (requestId, rejectReason) => {
         rejectMutation.mutate({
             requestId,
             rejectReason,
-            page: currentPage,
         });
     };
 
     return {
         activeType,
         setActiveType: handleChangeType,
-        filteredList: summary.filteredList,
-        currentPageData: summary.currentPageData,
-        currentPage: summary.safeCurrentPage,
-        totalPages: summary.totalPages,
-        startItemNumber: summary.startItemNumber,
-        endItemNumber: summary.endItemNumber,
-        pendingCount: summary.pendingCount,
-        approvedCount: summary.approvedCount,
-        rejectedCount: summary.rejectedCount,
-        monthlyVacationCount: summary.monthlyVacationCount,
-        isLoading,
-        isError,
-        error,
+        filteredList: viewModel.filteredList,
+        currentPageData: viewModel.currentPageData,
+        currentPage: viewModel.safeCurrentPage,
+        totalPages: viewModel.totalPages,
+        startItemNumber: viewModel.startItemNumber,
+        endItemNumber: viewModel.endItemNumber,
+        pendingCount: viewModel.pendingCount,
+        approvedCount: viewModel.approvedCount,
+        rejectedCount: viewModel.rejectedCount,
+        monthlyVacationCount: viewModel.monthlyVacationCount,
+        isLoading: isListLoading || isSummaryLoading,
+        isError: isListError || isSummaryError,
+        error: listError || summaryError,
         handleApprove,
         handleReject,
         goToPage,
