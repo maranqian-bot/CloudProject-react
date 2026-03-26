@@ -20,7 +20,6 @@ function VacationRequest() {
             <main className="main-container">
                 <VacationRequestHeader />
 
-                {/* 휴가 신청 폼 */}
                 <form onSubmit={vacationRequest.handleSubmit}>
                     <VacationRequestEmployeeCard
                         employee={vacationRequest.currentEmployee}
@@ -42,7 +41,7 @@ function VacationRequest() {
                             formData={vacationRequest.formData}
                             errors={vacationRequest.errors}
                             onInputChange={vacationRequest.handleInputChange}
-                            remainingVacationText={vacationRequest.remainingVacationText}
+                            remainingVacationText={vacationRequest.availableVacationText}
                             requestAfterApprovalText={vacationRequest.requestAfterApprovalText}
                         />
                     </div>
