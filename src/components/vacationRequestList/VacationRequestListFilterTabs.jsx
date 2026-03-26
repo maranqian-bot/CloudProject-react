@@ -1,6 +1,6 @@
 import { TYPE_TABS } from "../../utils/vacationRequestUtils";
 
-function VacationRequestFilterTabs({ activeType, setActiveType, totalCount }) {
+function VacationRequestListFilterTabs({ activeType, setActiveType, totalCount }) {
     return (
         <div className="table-header">
             <div className="tabs">
@@ -21,4 +21,4 @@ function VacationRequestFilterTabs({ activeType, setActiveType, totalCount }) {
     );
 }
 
-export default VacationRequestFilterTabs;
+export default VacationRequestListFilterTabs;

@@ -1,4 +1,4 @@
-function VacationRequestPagination({
+function VacationRequestListPagination({
     totalCount,
     startItemNumber,
     endItemNumber,
@@ -69,4 +69,4 @@ function VacationRequestPagination({
     );
 }
 
-export default VacationRequestPagination;
+export default VacationRequestListPagination;

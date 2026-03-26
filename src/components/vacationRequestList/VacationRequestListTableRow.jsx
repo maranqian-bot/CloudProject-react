@@ -6,7 +6,7 @@ import {
     formatDays,
 } from "../../utils/vacationRequestUtils";
 
-function VacationRequestTableRow({
+function VacationRequestListTableRow({
     item,
     onApprove,
     onReject,
@@ -82,4 +82,4 @@ function VacationRequestTableRow({
     );
 }
 
-export default VacationRequestTableRow;
+export default VacationRequestListTableRow;

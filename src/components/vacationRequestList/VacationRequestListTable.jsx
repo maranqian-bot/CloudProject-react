@@ -1,7 +1,7 @@
-import VacationRequestFilterTabs from "./VacationRequestFilterTabs";
-import VacationRequestTableRow from "./VacationRequestTableRow";
+import VacationRequestFilterTabs from "./VacationRequestListFilterTabs";
+import VacationRequestListTableRow from "./VacationRequestListTableRow";
 
-function VacationRequestTable({
+function VacationRequestListTable({
     activeType,
     setActiveType,
     totalCount,
@@ -64,7 +64,7 @@ function VacationRequestTable({
                         </tr>
                     ) : (
                         currentPageData.map((item) => (
-                            <VacationRequestTableRow
+                            <VacationRequestListTableRow
                                 key={item.id}
                                 item={item}
                                 onApprove={onApprove}
@@ -80,4 +80,4 @@ function VacationRequestTable({
     );
 }
 
-export default VacationRequestTable;
+export default VacationRequestListTable;

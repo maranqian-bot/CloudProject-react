@@ -1,4 +1,4 @@
-function VacationRequestHeader() {
+function VacationRequestListHeader() {
     return (
         <div className="page-header">
             <div className="page-title">
@@ -25,4 +25,4 @@ function VacationRequestHeader() {
     );
 }
 
-export default VacationRequestHeader;
+export default VacationRequestListHeader;
