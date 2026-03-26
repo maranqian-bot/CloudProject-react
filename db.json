@@ -42,6 +42,15 @@
       "attendanceStatus": "OVERTIME"
     }
   ],
+  "currentEmployee": {
+    "employeeId": 101,
+    "employeeName": "이수진",
+    "position": "선임",
+    "profileImage": null,
+    "deptId": 2,
+    "departmentName": "개발팀",
+    "remainingVacationDays": 12.5
+  },
   "vacationRequests": [
     {
       "id": 1,
