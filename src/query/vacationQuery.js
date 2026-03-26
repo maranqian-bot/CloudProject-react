@@ -4,9 +4,12 @@ import {
     getVacationRequestSummary,
     approveVacationRequest,
     rejectVacationRequest,
+    getCurrentEmployee,
+    createVacationRequest,
 } from "../api/vacationApi";
 
 export const QUERY_KEYS = {
+    CURRENT_EMPLOYEE: ["currentEmployee"],
     VACATION_REQUEST_LIST_BASE: ["vacationRequestList"],
     VACATION_REQUEST_LIST: ({ page, type }) => [
         ...QUERY_KEYS.VACATION_REQUEST_LIST_BASE,
@@ -14,6 +17,13 @@ export const QUERY_KEYS = {
         type,
     ],
     VACATION_REQUEST_SUMMARY: ["vacationRequestSummary"],
+};
+
+export const useCurrentEmployeeQuery = () => {
+    return useQuery({
+        queryKey: QUERY_KEYS.CURRENT_EMPLOYEE,
+        queryFn: getCurrentEmployee,
+    });
 };
 
 export const useVacationRequestListQuery = ({ page, limit, type }) => {
@@ -45,6 +55,10 @@ const useVacationMutation = (mutationFn) => {
             });
         },
     });
+};
+
+export const useCreateVacationRequestMutation = () => {
+    return useVacationMutation(createVacationRequest);
 };
 
 export const useApproveVacationRequestMutation = () => {
