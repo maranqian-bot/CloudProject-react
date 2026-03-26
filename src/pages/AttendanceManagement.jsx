@@ -35,7 +35,6 @@ function AttendanceManagement() {
   const {
     currentPage,
     totalPages,
-    currentData,
     pageNumbers,
     startItemNumber,
     endItemNumber,

@@ -1,3 +1,4 @@
+import { useAttendanceExcelDownloadMutation } from "../../query/attendanceExcelMutation";
 import {
   formatDate,
   formatDateOfWeek,
@@ -19,6 +20,14 @@ function AttendanceHistoryTable({
   goToNextPage,
   onExcelExport,
 }) {
+
+  const employeeId = 1;
+  const excelDownloadMutation = useAttendanceExcelDownloadMutation();
+
+  const handleDownloadExcel = () => {
+    excelDownloadMutation.mutate(employeeId);
+  }
+  
   return (
     <div className="table-container">
       <div className="table-header">
@@ -27,7 +36,7 @@ function AttendanceHistoryTable({
           <p>현재 정산 주기의 이력 데이터입니다.</p>
         </div>
         <div className="header-actions">
-          <button className="btn-dark" onClick={onExcelExport}>
+          <button className="btn-dark" onClick={handleDownloadExcel}>
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 16 }}

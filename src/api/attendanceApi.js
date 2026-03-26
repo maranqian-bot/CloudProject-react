@@ -14,8 +14,13 @@ import axiosInstance from "./axiosInstance"
 //     "attendanceScore": 94.8
 // }
 export const getAttendanceSummaryApi = async () => {
-    const response = await axiosInstance.get("/attendance/summary");
-    return response.data[0];
+    try { // ${employeeId} 수정 예정
+        const response = await axiosInstance.get(`/api/employees/1/attendance/summary`);
+        return response.data;
+    } catch(e) {
+        console.error(e);
+        throw e;
+    }
 };
 
 // 근태 이력 조회용 api(더미)
@@ -29,14 +34,24 @@ export const getAttendanceSummaryApi = async () => {
 //     "attendanceStatus": "NORMAL"
 // }
 export const getAttendanceHistoryApi = async () => {
-    const response = await axiosInstance.get("/attendance/history");
-    return response.data;
+    try {
+        const response = await axiosInstance.get(`/api/employees/1/attendance/history`);
+        return response.data;
+    } catch(e) {
+        console.error(e);
+        throw e;
+    }
 }
 
 // 근태 엑셀 다운로드 api
 export const downloadAttendanceExcelApi = async () => {
-    const response = await axiosInstance.get("/attendance/export", {
-        responseType: "blob", // 파일 형태로 받음
-    });
-    return response.data;
+    try {
+        const response = await axiosInstance.get("/api/employees/1/attendance/excel", {
+            responseType: "blob", // 파일 형태로 받음
+        });
+        return response.data;
+    } catch(e) {
+        console.error(e);
+        throw e;
+    }
 }
