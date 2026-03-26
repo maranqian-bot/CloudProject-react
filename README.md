@@ -148,9 +148,8 @@ DB_PASSWORD=your_password
 
 환경 변수를 설정하지 않으면 프로젝트 실행 시 오류가 발생합니다.
 
----
 
-# 1. 더미데이터 테스트 (Json-Server)
+## 더미데이터 테스트 (Json-Server)
 db.json에 더미데이터를 넣어 테스트할 수 있습니다.
 
 routes.json 파일은 아래와 같이 api를 작성합니다.
