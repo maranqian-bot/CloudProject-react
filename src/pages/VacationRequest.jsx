@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/vacation-request.css?inline";
 import { useVacationRequest } from "../hooks/useVacationRequest";
-import VacationRequestHeader from "../components/vacationRequestList/VacationRequestListHeader.jsx";
+import VacationRequestHeader from "../components/vacationRequest/VacationRequestHeader.jsx";
 import VacationRequestEmployeeCard from "../components/vacationRequest/VacationRequestEmployeeCard";
 import VacationRequestReasonSection from "../components/vacationRequest/VacationRequestReasonSection";
 import VacationRequestScheduleSection from "../components/vacationRequest/VacationRequestScheduleSection";
