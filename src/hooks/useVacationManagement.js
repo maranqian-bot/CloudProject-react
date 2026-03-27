@@ -11,7 +11,19 @@ const ITEMS_PER_PAGE = 5;
 
 const getDateTime = (dateString) => {
     if (!dateString) return 0;
-    return new Date(dateString).getTime();
+
+    const time = new Date(dateString).getTime();
+    return Number.isNaN(time) ? 0 : time;
+};
+
+const isCurrentYearDate = (dateString) => {
+    if (!dateString) return false;
+
+    const targetDate = new Date(dateString);
+    if (Number.isNaN(targetDate.getTime())) return false;
+
+    const now = new Date();
+    return targetDate.getFullYear() === now.getFullYear();
 };
 
 export const useVacationManagement = () => {
@@ -44,24 +56,26 @@ export const useVacationManagement = () => {
 
         const myHistory = currentEmployee
             ? allRequests
-                .filter(
-                    (item) => item.employeeId === currentEmployee.employeeId
-                )
-                .sort(
-                    (a, b) => getDateTime(b.startDate) - getDateTime(a.startDate)
-                )
+                  .filter(
+                      (item) => item.employeeId === currentEmployee.employeeId
+                  )
+                  .sort(
+                      (a, b) =>
+                          getDateTime(b.startDate) - getDateTime(a.startDate)
+                  )
             : [];
 
         const myPendingApprovals = currentEmployee
             ? allRequests
-                .filter(
-                    (item) =>
-                        item.status === "PENDING" &&
-                        item.approverId === currentEmployee.employeeId
-                )
-                .sort(
-                    (a, b) => getDateTime(b.startDate) - getDateTime(a.startDate)
-                )
+                  .filter(
+                      (item) =>
+                          item.status === "PENDING" &&
+                          item.approverId === currentEmployee.employeeId
+                  )
+                  .sort(
+                      (a, b) =>
+                          getDateTime(b.startDate) - getDateTime(a.startDate)
+                  )
             : [];
 
         const totalCount = myHistory.length;
@@ -87,8 +101,13 @@ export const useVacationManagement = () => {
             totalCount
         );
 
+        // 사용 휴가는 startDate 기준으로 연도 계산
         const usedVacationDays = myHistory
-            .filter((item) => item.status === "APPROVED")
+            .filter(
+                (item) =>
+                    item.status === "APPROVED" &&
+                    isCurrentYearDate(item.startDate)
+            )
             .reduce((acc, item) => acc + Number(item.days || 0), 0);
 
         return {
