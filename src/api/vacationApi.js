@@ -1,13 +1,26 @@
 import axiosInstance from "./axiosInstance";
 
+const VACATION_REQUEST_STATUS = {
+    PENDING: "PENDING",
+    APPROVED: "APPROVED",
+    REJECTED: "REJECTED",
+};
+
+const toSafeNumber = (value) => {
+    const parsedValue = Number(value);
+    return Number.isNaN(parsedValue) ? 0 : parsedValue;
+};
+
 const getMockEndDate = ({ startDate, selectedDays }) => {
-    // 임시 mock 규칙: 시작일 기준으로 단순 계산
-    if (!startDate || selectedDays <= 1) {
+    const days = Number(selectedDays);
+
+    // 숫자 변환 실패 또는 1일 이하일 경우 시작일 그대로 반환
+    if (!startDate || Number.isNaN(days) || days <= 1) {
         return startDate;
     }
 
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + Math.ceil(selectedDays) - 1);
+    endDate.setDate(endDate.getDate() + Math.ceil(days) - 1);
 
     const year = endDate.getFullYear();
     const month = String(endDate.getMonth() + 1).padStart(2, "0");
@@ -58,9 +71,9 @@ export const getVacationRequestSummary = async () => {
         ).padStart(2, "0")}`;
 
         list.forEach((item) => {
-            if (item.status === "PENDING") pendingCount += 1;
-            if (item.status === "APPROVED") approvedCount += 1;
-            if (item.status === "REJECTED") rejectedCount += 1;
+            if (item.status === VACATION_REQUEST_STATUS.PENDING) pendingCount += 1;
+            if (item.status === VACATION_REQUEST_STATUS.APPROVED) approvedCount += 1;
+            if (item.status === VACATION_REQUEST_STATUS.REJECTED) rejectedCount += 1;
 
             if (item.startDate?.startsWith(currentMonth)) {
                 employeeSet.add(item.employeeId);
@@ -84,7 +97,7 @@ export const approveVacationRequest = async ({ requestId }) => {
         const response = await axiosInstance.patch(
             `/vacationRequests/${requestId}`,
             {
-                status: "APPROVED",
+                status: VACATION_REQUEST_STATUS.APPROVED,
                 approvedAt: new Date().toISOString(),
                 rejectReason: null,
                 approverId: 9001,
@@ -104,7 +117,7 @@ export const rejectVacationRequest = async ({ requestId, rejectReason }) => {
         const response = await axiosInstance.patch(
             `/vacationRequests/${requestId}`,
             {
-                status: "REJECTED",
+                status: VACATION_REQUEST_STATUS.REJECTED,
                 rejectReason: rejectReason || "반려 처리",
                 approvedAt: null,
                 approverId: 9001,
@@ -136,13 +149,36 @@ export const createVacationRequest = async ({ currentEmployee, formData }) => {
             throw new Error("currentEmployee is required");
         }
 
-        const selectedDays = Number(formData.days);
+        if (!formData) {
+            throw new Error("formData is required");
+        }
+
+        const selectedDays = toSafeNumber(formData.days);
         const startDate = formData.startDate;
+        const vacationType = formData.vacationType;
+        const reasonDetail = formData.reasonDetail ?? "";
+
+        // 최소 필수값 검증
+        if (!startDate) {
+            throw new Error("formData.startDate is required");
+        }
+
+        if (!vacationType) {
+            throw new Error("formData.vacationType is required");
+        }
+
+        if (selectedDays <= 0) {
+            throw new Error("formData.days must be greater than 0");
+        }
+
+        if (vacationType === "기타" && !reasonDetail.trim()) {
+            throw new Error("formData.reasonDetail is required");
+        }
 
         const reason =
-            formData.vacationType === "기타"
-                ? formData.reasonDetail.trim()
-                : `${formData.vacationType} 신청`;
+            vacationType === "기타"
+                ? reasonDetail.trim()
+                : `${vacationType} 신청`;
 
         const payload = {
             employeeId: currentEmployee.employeeId,
@@ -151,7 +187,7 @@ export const createVacationRequest = async ({ currentEmployee, formData }) => {
             profileImage: currentEmployee.profileImage ?? null,
             deptId: currentEmployee.deptId,
             departmentName: currentEmployee.departmentName,
-            vacationType: formData.vacationType,
+            vacationType,
             startDate,
             endDate: getMockEndDate({
                 startDate,
@@ -159,7 +195,7 @@ export const createVacationRequest = async ({ currentEmployee, formData }) => {
             }),
             days: selectedDays,
             reason,
-            status: "PENDING",
+            status: VACATION_REQUEST_STATUS.PENDING,
             approvedAt: null,
             rejectReason: null,
             approverId: null,
