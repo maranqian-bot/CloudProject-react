@@ -3,7 +3,7 @@ import { useDepartmentForm } from "./useDepartmentForm";
 import { useDepartmentSubmit } from "./useDepartmentSubmit";
 
 // Query, Form, Submit 통합(관리)훅
-export const useDepartmentDetail = () => {
+export const useDepartmentDetail = (deptid) => {
   // 상세 정보 조회
   const { data: detail, isLoading, isError } = useDepartmentDetailQuery(deptid);
 
@@ -26,6 +26,7 @@ export const useDepartmentDetail = () => {
     isLoading,
     isError,
     isSubmitting,
+    isDeleting,
     handleInputChange,
     onUpdate,
     onDelete: () => handleDelete(deptid)

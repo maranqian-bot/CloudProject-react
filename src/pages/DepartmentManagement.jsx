@@ -2,8 +2,20 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/dashboard.css?inline";
+import { useDepartmentList } from "../hooks/useDepartmentList";
 
 function DepartmentManagement() {
+
+    const {
+        list,
+        paginationText,
+        isLoading,
+        goToNextPage,
+        goToPrevPage,
+        currentPage,
+        totalPages
+    } = useDepartmentList(5);
+
     return (
         <>
             <Sidebar />
@@ -64,169 +76,62 @@ function DepartmentManagement() {
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td className="code-cell">FIN-001</td>
-                                    <td className="name-cell">재무전략본부</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">J</div>
-                                            <span>제임스 카터</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-blue">32명</span>
-                                    </td>
-                                    <td>4.8년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="code-cell">HR-015</td>
-                                    <td className="name-cell">인사혁신실</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">A</div>
-                                            <span>아멜리아 레이</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-violet">18명</span>
-                                    </td>
-                                    <td>3.6년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="code-cell">MKT-042</td>
-                                    <td className="name-cell">성장 및 전략</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">E</div>
-                                            <span>엘레나 룬드</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-green">+85</span>
-                                    </td>
-                                    <td>5.1년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="code-cell">MKT-042</td>
-                                    <td className="name-cell">성장 및 전략</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">E</div>
-                                            <span>엘레나 룬드</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-green">+85</span>
-                                    </td>
-                                    <td>5.1년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="code-cell">MKT-042</td>
-                                    <td className="name-cell">성장 및 전략</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">E</div>
-                                            <span>엘레나 룬드</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-green">+85</span>
-                                    </td>
-                                    <td>5.1년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td className="code-cell">MKT-042</td>
-                                    <td className="name-cell">성장 및 전략</td>
-                                    <td>
-                                        <div className="manager-cell">
-                                            <div className="avatar-shell">E</div>
-                                            <span>엘레나 룬드</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="status-badge status-green">+85</span>
-                                    </td>
-                                    <td>5.1년</td>
-                                    <td style={{ textAlign: "right" }}>
-                                        <button
-                                            className="btn-edit"
-                                            onClick={() => (window.location.href = "/department-edit")}
-                                        >
-                                            상세 보기
-                                        </button>
-                                    </td>
-                                </tr>
+                                {isLoading ? (
+                                    <tr><td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>데이터를 불러오는 중입니다... ⏳</td></tr>
+                                ) : list.length === 0 ? (
+                                    <tr><td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>등록된 부서가 없습니다. 텅~ 📭</td></tr>
+                                ) : (
+                                    list.map((dept) => (
+                                        <tr key={dept.deptid}>
+                                            <td className="code-cell">{dept.deptCode}</td>
+                                            <td className="name-cell">{dept.deptName}</td>
+                                            <td>
+                                                <div className="manager-cell">
+                                                    <div className="avatar-shell">{dept.managerDisplayText.charAt(0)}</div>
+                                                    <span>{dept.managerDisplayText}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className={`status-badge ${dept.status === 'ACTIVE' ? 'status-blue' : 'status-gray'}`}>
+                                                    {dept.statusDisplayText}
+                                                </span>
+                                            </td>
+                                            <td style={{ textAlign: "right" }}>
+                                                <button
+                                                    className="btn-edit"
+                                                    onClick={() => (window.location.href = `/department-edit/${dept.deptid}`)}
+                                                >
+                                                    상세 보기
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
 
                         <div className="table-footer">
-                            <p className="footer-info">
-                                전체 17개의 휴가 이력 중 1~5번째 표시 중
-                            </p>
+                            <p className="footer-info">{paginationText}</p>
                             <div className="pagination">
-                                <button className="page-btn" type="button">
-                                    <span className="material-symbols-outlined">
-                                        chevron_left
-                                    </span>
+                                {/* 이전 버튼 */}
+                                <button
+                                    className="page-btn"
+                                    onClick={goToPrevPage}
+                                    disabled={currentPage === 1}
+                                >
+                                    <span className="material-symbols-outlined">chevron_left</span>
                                 </button>
-                                <button className="page-btn active" type="button">
-                                    1
-                                </button>
-                                <button className="page-btn" type="button">
-                                    2
-                                </button>
-                                <button className="page-btn" type="button">
-                                    3
-                                </button>
-                                <button className="page-btn" type="button">
-                                    <span className="material-symbols-outlined">
-                                        chevron_right
-                                    </span>
+
+                                {/* 현재 페이지 표시 */}
+                                <button className="page-btn active">{currentPage}</button>
+
+                                {/* 다음 버튼 */}
+                                <button
+                                    className="page-btn"
+                                    onClick={goToNextPage}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <span className="material-symbols-outlined">chevron_right</span>
                                 </button>
                             </div>
                         </div>

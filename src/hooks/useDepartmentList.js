@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDepartmentDerivedState } from "./useDepartmentDerivedState";
+import { useDepartmentDerivedState } from "../useDepartmentDerivedState";
 
 // 부서 관리 통합 훅 (부서 목록)
 export const useDepartmentList = (itemsPerPage = 5) => {

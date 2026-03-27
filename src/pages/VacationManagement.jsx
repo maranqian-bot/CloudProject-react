@@ -1,14 +1,14 @@
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
-import withPageStyle from "./utils/withPageStyle.jsx";
-import pageCss from "./styles/dashboard.css?inline";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+import withPageStyle from "../utils/withPageStyle.jsx";
+import pageCss from "../styles/dashboard.css?inline";
 
-import { useVacationManagement } from "./hooks/useVacationManagement";
+import { useVacationManagement } from "../hooks/useVacationManagement";
 
-import VacationManagementHeader from "./components/vacationManagement/VacationManagementHeader.jsx";
-import VacationManagementSummary from "./components/vacationManagement/VacationManagementSummary.jsx";
-import VacationManagementHistorySection from "./components/vacationManagement/VacationManagementHistorySection.jsx";
-import VacationManagementPendingSection from "./components/vacationManagement/VacationManagementPendingSection.jsx";
+import VacationManagementHeader from "../components/vacationManagement/VacationManagementHeader.jsx";
+import VacationManagementSummary from "../components/vacationManagement/VacationManagementSummary.jsx";
+import VacationManagementHistorySection from "../components/vacationManagement/VacationManagementHistorySection.jsx";
+import VacationManagementPendingSection from "../components/vacationManagement/VacationManagementPendingSection.jsx";
 
 function VacationManagement() {
     const vacationManagementViewModel = useVacationManagement();
