@@ -56,26 +56,26 @@ export const useVacationManagement = () => {
 
         const myHistory = currentEmployee
             ? allRequests
-                  .filter(
-                      (item) => item.employeeId === currentEmployee.employeeId
-                  )
-                  .sort(
-                      (a, b) =>
-                          getDateTime(b.startDate) - getDateTime(a.startDate)
-                  )
+                .filter(
+                    (item) => item.employeeId === currentEmployee.employeeId
+                )
+                .sort(
+                    (a, b) =>
+                        getDateTime(b.startDate) - getDateTime(a.startDate)
+                )
             : [];
 
         const myPendingApprovals = currentEmployee
             ? allRequests
-                  .filter(
-                      (item) =>
-                          item.status === "PENDING" &&
-                          item.approverId === currentEmployee.employeeId
-                  )
-                  .sort(
-                      (a, b) =>
-                          getDateTime(b.startDate) - getDateTime(a.startDate)
-                  )
+                .filter(
+                    (item) =>
+                        item.status === "PENDING" &&
+                        item.approverId === currentEmployee.employeeId
+                )
+                .sort(
+                    (a, b) =>
+                        getDateTime(b.startDate) - getDateTime(a.startDate)
+                )
             : [];
 
         const totalCount = myHistory.length;

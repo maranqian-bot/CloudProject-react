@@ -21,10 +21,6 @@ export const STATUS = {
     },
 };
 
-export const getStatusLabel = (status) => {
-    return STATUS[status]?.label ?? status;
-};
-
 export const getStatusClass = (status) => {
     return STATUS[status]?.className ?? "badge";
 };
@@ -49,7 +45,28 @@ export const formatDateRange = (startDate, endDate) => {
     return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
-export const formatDays = (days) => {
+export const formatVacationDays = (days) => {
     if (days === null || days === undefined) return "-";
     return `${days}일`;
+};
+
+export const getVacationStatusLabel = (status, mode = "management") => {
+    const labels = {
+        management: {
+            PENDING: "대기",
+            APPROVED: "승인",
+            REJECTED: "반려",
+        },
+        history: {
+            PENDING: "요청됨",
+            APPROVED: "승인됨",
+            REJECTED: "반려됨",
+        },
+    };
+
+    return labels[mode]?.[status] ?? status;
+};
+
+export const getStatusLabel = (status) => {
+    return getVacationStatusLabel(status, "management");
 };
