@@ -3,7 +3,7 @@ import { createDepartmentApi, deleteDepartmentApi, getDepartmentDetailApi, getDe
 
 
 // 부서 등록 Mutation
-export const useCreateDepartment = () => {
+export const useCreateDepartmentMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createDepartmentApi,
@@ -14,7 +14,7 @@ export const useCreateDepartment = () => {
 };
 
 // 부서 목록 조회 Query
-export const useDepartment = (page, size) => {
+export const useDepartmentQuery = (page, size) => {
   return useQuery({
     queryKey:["departments", page, size],
     queryFn: () => getDepartmentListApi(page, size),
@@ -23,7 +23,7 @@ export const useDepartment = (page, size) => {
 };
 
 // 부서 상세 조회 Query
-export const useDepartmentDetail = (deptid) => {
+export const useDepartmentDetailQuery = (deptid) => {
   return useQuery({
     queryKey:["department", deptid],
     queryFn: () => getDepartmentDetailApi(deptid),
@@ -32,19 +32,19 @@ export const useDepartmentDetail = (deptid) => {
 };
 
 // 부서 정보 수정 Mutation
-export const useUpdateDepartment = (deptid) => {
+export const useUpdateDepartmentMutation = () => { 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (deptData) => updateDepartmentApi(deptid, deptData),
-    onSuccess: () => {
+    mutationFn: ({ deptid, data }) => updateDepartmentApi(deptid, data), 
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries(["departments"]);
-      queryClient.invalidateQueries("departments", deptid);
+      queryClient.invalidateQueries(["department", variables.deptid]); //캐시 갱신
     },
   });
 };
 
 // 부서 삭제 Mutation
-export const useDeleteDepartment = () => {
+export const useDeleteDepartmentMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteDepartmentApi,
