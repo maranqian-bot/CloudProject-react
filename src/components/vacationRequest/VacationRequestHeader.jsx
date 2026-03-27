@@ -1,26 +1,20 @@
 function VacationRequestHeader() {
     return (
         <div className="page-header">
-            <div className="page-title">
-                <h2>연차 관리 이력</h2>
-                <p>팀원들의 휴가 신청 현황을 검토하고 승인하세요.</p>
-            </div>
-
-            <div className="btn-group">
-                <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => (window.location.href = "/vacation-request")}
+            <div className="breadcrumb">
+                <span>인사관리</span>
+                <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: "16px" }}
                 >
-                    <span
-                        className="material-symbols-outlined"
-                        style={{ fontSize: "16px" }}
-                    >
-                        add
-                    </span>
-                    대리 신청
-                </button>
+                    chevron_right
+                </span>
+                <span>휴가 관리</span>
             </div>
+            <h2 className="page-title">휴가 신청</h2>
+            <p className="page-desc">
+                휴가 신청서를 작성합니다. 정확한 정보를 입력해 주세요.
+            </p>
         </div>
     );
 }

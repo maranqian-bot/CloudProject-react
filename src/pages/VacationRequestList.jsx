@@ -5,11 +5,11 @@ import pageCss from "../styles/vacation-request-list.css?inline";
 
 import { useVacationRequestList } from "../hooks/useVacationRequestList";
 
-import VacationRequestHeader from "../components/vacationRequest/VacationRequestHeader";
-import VacationRequestStats from "../components/vacationRequest/VacationRequestStats";
-import VacationRequestTable from "../components/vacationRequest/VacationRequestTable";
-import VacationRequestPagination from "../components/vacationRequest/VacationRequestPagination";
-import VacationRequestPolicyNote from "../components/vacationRequest/VacationRequestPolicyNote";
+import VacationRequestListHeader from "../components/vacationRequestList/VacationRequestListHeader.jsx";
+import VacationRequestListStats from "../components/vacationRequestList/VacationRequestListStats.jsx";
+import VacationRequestListTable from "../components/vacationRequestList/VacationRequestListTable.jsx";
+import VacationRequestListPagination from "../components/vacationRequestList/VacationRequestListPagination.jsx";
+import VacationRequestListPolicyNote from "../components/vacationRequestList/VacationRequestListPolicyNote.jsx";
 
 function VacationRequestList() {
     const vacationRequest = useVacationRequestList();
@@ -21,16 +21,16 @@ function VacationRequestList() {
 
             <main>
                 <div className="page-canvas">
-                    <VacationRequestHeader />
+                    <VacationRequestListHeader />
 
-                    <VacationRequestStats
+                    <VacationRequestListStats
                         pendingCount={vacationRequest.pendingCount}
                         approvedCount={vacationRequest.approvedCount}
                         rejectedCount={vacationRequest.rejectedCount}
                         monthlyVacationCount={vacationRequest.monthlyVacationCount}
                     />
 
-                    <VacationRequestTable
+                    <VacationRequestListTable
                         activeType={vacationRequest.activeType}
                         setActiveType={vacationRequest.setActiveType}
                         totalCount={vacationRequest.totalCount}
@@ -44,7 +44,7 @@ function VacationRequestList() {
                         isRejecting={vacationRequest.isRejecting}
                     />
 
-                    <VacationRequestPagination
+                    <VacationRequestListPagination
                         totalCount={vacationRequest.totalCount}
                         startItemNumber={vacationRequest.startItemNumber}
                         endItemNumber={vacationRequest.endItemNumber}
@@ -56,7 +56,7 @@ function VacationRequestList() {
                     />
                 </div>
 
-                <VacationRequestPolicyNote />
+                <VacationRequestListPolicyNote />
             </main>
         </>
     );

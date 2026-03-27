@@ -1,4 +1,4 @@
-function VacationRequestStats({
+function VacationRequestListStats({
     pendingCount,
     approvedCount,
     rejectedCount,
@@ -64,4 +64,4 @@ function VacationRequestStats({
     );
 }
 
-export default VacationRequestStats;
+export default VacationRequestListStats;
