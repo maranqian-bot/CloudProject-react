@@ -1,4 +1,4 @@
-function VacationRequestPolicyNote() {
+function VacationRequestListPolicyNote() {
     return (
         <div className="info-note">
             <span className="material-symbols-outlined info-icon">info</span>
@@ -14,4 +14,4 @@ function VacationRequestPolicyNote() {
     );
 }
 
-export default VacationRequestPolicyNote;
+export default VacationRequestListPolicyNote;
