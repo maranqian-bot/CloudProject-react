@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {
     formatDateRange,
     formatVacationDays,
-} from "./utils/vacationRequestUtils";
+} from "../../utils/vacationRequestUtils";
 
 function VacationManagementPendingSection({
     myPendingApprovals,

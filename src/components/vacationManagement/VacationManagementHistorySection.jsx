@@ -1,10 +1,10 @@
-import VacationRequestListPagination from "./components/vacationRequestList/VacationRequestListPagination.jsx";
+import VacationRequestListPagination from "../vacationRequestList/VacationRequestListPagination.jsx";
 import {
     formatDateRange,
     formatVacationDays,
     getStatusClass,
     getVacationStatusLabel,
-} from "./utils/vacationRequestUtils";
+} from "../../utils/vacationRequestUtils";
 
 function VacationManagementHistorySection({
     currentPageData,

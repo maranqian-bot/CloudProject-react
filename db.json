@@ -49,7 +49,7 @@
     "profileImage": null,
     "deptId": 2,
     "departmentName": "개발팀",
-    "remainingVacationDays": 12.5
+    "availableVacationDays": 12.5
   },
   "vacationRequests": [
     {

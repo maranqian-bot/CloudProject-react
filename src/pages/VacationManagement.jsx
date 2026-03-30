@@ -23,8 +23,8 @@ function VacationManagement() {
                     <VacationManagementHeader />
 
                     <VacationManagementSummary
-                        remainingVacationDays={
-                            vacationManagementViewModel.remainingVacationDays
+                        availableVacationDays={
+                            vacationManagementViewModel.availableVacationDays
                         }
                         usedVacationDays={
                             vacationManagementViewModel.usedVacationDays
