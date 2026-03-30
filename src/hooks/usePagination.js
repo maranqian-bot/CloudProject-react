@@ -3,15 +3,16 @@ import { useState, useMemo } from "react";
 export const usePagination = (data = [], itemsPerPage = 5, pagesPerGroup = 3) => {
   const [currentPage, setCurrentPage] = useState(1);
 
+  const safeData = Array.isArray(data) ? data : [];
   // 전체 페이지 수
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(safeData.length / itemsPerPage);
 
   // 현재 페이지에 보여줄 데이터
   const currentData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    return data.slice(startIndex, endIndex);
-  }, [data, currentPage, itemsPerPage]);
+    return safeData.slice(startIndex, endIndex);
+  }, [safeData, currentPage, itemsPerPage]);
 
   // 현재 페이지가 속한 페이지 그룹
   const currentGroup = Math.ceil(currentPage / pagesPerGroup);
