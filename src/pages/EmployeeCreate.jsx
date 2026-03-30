@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
@@ -16,7 +16,10 @@ function EmployeeCreate() {
         email: "",
         status: "활성",
         password: "",
-        deptId: ""
+        deptId: "",    // 부서 기본키
+        hireDate: "",  // 입사일
+        role: ""   // 시스템 역할
+
     });
 
     // 기존값 무효화하고, 최신값 반영 
@@ -45,12 +48,21 @@ function EmployeeCreate() {
             ...formData,            // 입력받지 않은건 기존값으로 유지.
             [name]: updatedValue   // 입력으로 받은 것만 갱신해줌.
         });
-    const handleSubmit = (e) => {
+    }
+    const handlesubmit = (e) => {
         e.preventDefault();
         mutate(formData); //    현재값으로 확정.   
-                    // employeeApi에, postEmployeesApi의 매개변수로 formData를 전달
+        // employeeApi에, postEmployeesApi의 매개변수로 formData를 전달
     }
-    }
+
+    const handleStatusChange = (e) => {
+        const isActive = e.target.checked; // 체크박스 상태 (true/false)
+        setFormData({
+            ...formData,
+            status: isActive ? "ACTIVE" : "INACTIVE" // 체크되면 ACTIVE, 아니면 INACTIVE
+        });
+    };
+
 
 
 
@@ -58,8 +70,8 @@ function EmployeeCreate() {
         <>
             <Sidebar />
             <Header />
-            
-            <main className="main-content">         
+
+            <main className="main-content">
                 <div className="form-container">
                     <div className="editorial-header">
                         <nav className="breadcrumb">
@@ -77,7 +89,7 @@ function EmployeeCreate() {
                     </div>
                     <div className="card">
                         {/* handleSubmit() : 현재값으로 저장 확정 */}
-                        <form onsubmit = {handleSubmit}>  
+                        <form onsubmit={handlesubmit}>
                             {/* Section: 기본 정보 */}
                             <div className="form-section">
                                 <h2 className="section-title">기본 정보</h2>
@@ -89,13 +101,13 @@ function EmployeeCreate() {
                                         </label>
                                         {/* 사번 입력공간 */}
                                         <input
-                                                    className = "input"
-                                                    name = "employeeNumber"
-                                                    value = {formData.employeeNumber}
-                                                    onChange = {handleChange}
-                                                    placeholder = "예: Emp-2024-001"
-                                                    type = "text"
-                                                    required
+                                            className="input"
+                                            name="employeeNumber"
+                                            value={formData.employeeNumber}
+                                            onChange={handleChange}
+                                            placeholder="예: Emp-2024-001"
+                                            type="text"
+                                            required
                                         />
                                     </div>
                                     <div className="form-group">
@@ -103,13 +115,13 @@ function EmployeeCreate() {
                                             이름 <span className="required">*</span>
                                         </label>
                                         {/* 이름입력공간 */}
-                                        <input 
-                                            className = "input"
-                                            name = "name"
-                                            value = {formData.name}
-                                            onChange = {handleChange}
-                                            placeholder = "이름 입력하기"
-                                            type = "text"
+                                        <input
+                                            className="input"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            placeholder="이름 입력하기"
+                                            type="text"
                                             required
                                         />
                                     </div>
@@ -118,12 +130,12 @@ function EmployeeCreate() {
                                             이메일 <span className="required">*</span>
                                         </label>
                                         <input
-                                            className = "input"
-                                            name = "email"
-                                            value = {formData.email}
-                                            onChange = {handleChange}
-                                            placeholder = "영어@~~ 로 입력"
-                                            type = "email"
+                                            className="input"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="영어@~~ 로 입력"
+                                            type="email"
                                             required
                                         />
                                     </div>
@@ -132,12 +144,12 @@ function EmployeeCreate() {
                                             비밀번호<span className="required">*</span>
                                         </label>
                                         <input
-                                            className = "input"
-                                            name = "email"
-                                            value = {formData.password}
-                                            onChagne = {handleChange}
-                                            placeholder = " 예시 ) @12!s"
-                                            type = "password"
+                                            className="input"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder=" 예시 ) @12!s"
+                                            type="password"
                                             required
                                         />
                                     </div>
@@ -151,11 +163,11 @@ function EmployeeCreate() {
                                         <label className="label">
                                             부서 <span className="required">*</span>
                                         </label>
-                                        <select 
-                                            className = "select"
-                                            name = "deptId"
-                                            value = {formData.deptId}
-                                            onChange = {handleChange}
+                                        <select
+                                            className="select"
+                                            name="deptId"
+                                            value={formData.deptId}
+                                            onChange={handleChange}
                                             required
                                         >
                                             <option value="">부서 선택</option>
@@ -171,9 +183,9 @@ function EmployeeCreate() {
                                         </label>
                                         <input
                                             className="input"
-                                            name = "position"
-                                            value = {formData.position}
-                                            onChange = {handleChange};
+                                            name="position"
+                                            value={formData.position}
+                                            onChange={handleChange}
                                             placeholder="예: 시니어 매니저"
                                             type="text"
                                         />
@@ -182,7 +194,14 @@ function EmployeeCreate() {
                                         <label className="label">
                                             입사일 <span className="required">*</span>
                                         </label>
-                                        <input className="input" type="date" />
+                                        <input
+                                            className="input"
+                                            type="date"
+                                            name="hireDate"
+                                            value={formData.hireDate}
+                                            onChange={handleChange}
+                                            required
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -191,61 +210,81 @@ function EmployeeCreate() {
                                 <h2 className="section-title">권한 및 상태</h2>
                                 <div className="form-grid">
                                     <div className="form-group">
-                                        <label className="label">시스템 역할</label>
-                                        <div className="option-group">
-                                            <label className="radio-label">
+                                        {['EMPLOYEE', 'MANAGER', 'ADMIN'].map(role => (
+                                            <label key={role} className="radio-label">
                                                 <input
-                                                    defaultChecked=""
-                                                    className="radio-input"
-                                                    name="role"
                                                     type="radio"
+                                                    name="role"
+                                                    value={role}
+                                                    checked={formData.role === role} // 현재 상태와 일치하면 체크됨
+                                                    onChange={handleChange}
                                                 />
-                                                일반 직원 (EMPLOYEE)
+                                                {role}
                                             </label>
-                                            <label className="radio-label">
-                                                <input className="radio-input" name="role" type="radio" />
-                                                매니저 (MANAGER)
-                                            </label>
-                                            <label className="radio-label">
-                                                <input className="radio-input" name="role" type="radio" />
-                                                관리자 (ADMIN)
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="label">현재 상태</label>
-                                        <div className="status-toggle-container">
-                                            <label className="toggle-switch">
-                                                <input defaultChecked="" type="checkbox" />
-                                                <span className="slider" />
-                                            </label>
-                                            <span className="status-text">재직 중 (ACTIVE)</span>
-                                        </div>
+                                        ))}
+                                        <label className="radio-label">
+                                            <input className="radio-input" name="role" type="radio" />
+                                            매니저 (MANAGER)
+                                        </label>
+                                        <label className="radio-label">
+                                            <input className="radio-input" name="role" type="radio" />
+                                            관리자 (ADMIN)
+                                        </label>
                                     </div>
                                 </div>
+                                <div className="form-group">
+                                    <label className="label">현재 상태</label>
+                                    <div className="status-toggle-container">
+                                        <label className="toggle-switch">
+                                            <input
+                                                type="checkbox"
+                                                /* 상태가 "ACTIVE"일 때 체크 활성화 */
+                                                checked={formData.status === "ACTIVE"}
+                                                /* 전용 핸들러 호출 */
+                                                onChange={handleStatusChange}
+                                            />
+                                            <span className="slider" />
+                                        </label>
+                                        {/* 상태값에 따라 텍스트 내용 자동 변경 */}
+                                        <span className="status-text">
+                                            {formData.status === "ACTIVE" ? "재직 중 (ACTIVE)" : "퇴사/비활성 (INACTIVE)"}
+                                        </span>
+                                    </select>
+                                </div>
                             </div>
-                            <div className="form-actions">
+
+                            <div className="form-actions" style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "30px" }}>
+                                {/* 1. 취소 버튼: navigate() 함수로 올바르게 호출 */}
                                 <button
                                     className="btn btn-ghost"
                                     type="button"
-                                    onClick={() => {
-                                        window.location.href = "/employee-management";
-                                    }}
+                                    onClick={() => navigate("/employee/management/")}
                                 >
                                     취소
                                 </button>
-                                <button className="btn btn-primary" type="submit">
-                                    저장
+
+                                {/* 2. 등록 버튼: type="submit"으로 설정하여 form의 onSubmit이 실행되게 함 */}
+                                <button
+                                    type="submit"
+                                    className="btn-primary"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <span className="loading-text">등록 중...</span>
+                                    ) : (
+                                        "직원 등록 완료"
+                                    )}
                                 </button>
                             </div>
-                        </form>
                     </div>
-                    <p className="footer-hint">
-                        시스템에 등록된 모든 데이터는 개인정보 처리방침에 따라 안전하게
-                        보호됩니다.
-                    </p>
-                </div>
-            </main>
+                </form>
+            </div>
+            <p className="footer-hint">
+                시스템에 등록된 모든 데이터는 개인정보 처리방침에 따라 안전하게
+                보호됩니다.
+            </p>
+        </div >
+            </main >
 
         </>
     )

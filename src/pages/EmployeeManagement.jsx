@@ -3,8 +3,11 @@ import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/dashboard.css?inline";
 import employeeQuery from "../query/EmployeeQuery.js";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeManagement() {
+
+    const navigate = useNavigate();
 
     const {
         employee,   // 직원목록 객체
@@ -57,7 +60,7 @@ function EmployeeManagement() {
                 </td>
                 {/* 관리 버튼: 수정 페이지 이동 */}
                 <td className="action-cell">
-                    <button className="btn-edit" onClick={() => window.location.href = `/edit/${emp.id}`}>
+                    <button className="btn-edit" onClick= { () => navigate(`/edit/${emp.id}`)}>
                         <span className="material-symbols-outlined">edit</span>
                     </button>
                 </td>
@@ -84,7 +87,8 @@ function EmployeeManagement() {
                             <h1>직원 관리</h1>
                             <p>전체 {totalCount.toLocaleString()}명의 활성 인원 목록입니다.</p>
                         </div>
-                        <button className="btn-add-employee" onClick={() => (window.location.href = "/employee-create")}>
+                        {/* (window.location.href = "/employee-create") */}
+                        <button className="btn-add-employee" onClick = { () => navigate(`/employee/create`)}>
                             <span className="material-symbols-outlined">person_add</span> 직원 추가
                         </button>
                     </div>
