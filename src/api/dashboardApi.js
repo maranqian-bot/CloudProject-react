@@ -1,40 +1,23 @@
 import axiosInstance from "./axiosInstance";
 import {
     ATTENDANCE_STATUS,
+    canCheckIn,
+    canCheckOut,
     getAttendanceStatusByWorkMinutes,
+    getCurrentTimeString,
+    getMinutesFromTime,
+    getTodayDateString,
+    hasCheckedOut,
 } from "../utils/dashboardUtils";
 
-const getTodayDateString = () => {
-    const now = new Date();
+const fetchTodayHistory = async (workDate) => {
+    const response = await axiosInstance.get("/history", {
+        params: {
+            workDate,
+        },
+    });
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-};
-
-const getCurrentTimeString = () => {
-    const now = new Date();
-
-    const hour = String(now.getHours()).padStart(2, "0");
-    const minute = String(now.getMinutes()).padStart(2, "0");
-
-    return `${hour}:${minute}`;
-};
-
-const getMinutesFromTime = (timeText) => {
-    if (!timeText) return 0;
-
-    const [hourText = "0", minuteText = "0"] = String(timeText).split(":");
-    const hour = Number(hourText);
-    const minute = Number(minuteText);
-
-    if (Number.isNaN(hour) || Number.isNaN(minute)) {
-        return 0;
-    }
-
-    return hour * 60 + minute;
+    return response.data?.[0] ?? null;
 };
 
 export const getDashboardSummary = async () => {
@@ -54,14 +37,7 @@ export const getDashboardSummary = async () => {
 
 export const getTodayAttendance = async () => {
     const today = getTodayDateString();
-
-    const response = await axiosInstance.get("/history", {
-        params: {
-            workDate: today,
-        },
-    });
-
-    const todayHistory = response.data?.[0] ?? null;
+    const todayHistory = await fetchTodayHistory(today);
 
     return {
         workDate: today,
@@ -92,16 +68,9 @@ export const getRecentActivities = async ({ page, limit }) => {
 export const checkIn = async () => {
     const today = getTodayDateString();
     const currentTime = getCurrentTimeString();
+    const todayHistory = await fetchTodayHistory(today);
 
-    const response = await axiosInstance.get("/history", {
-        params: {
-            workDate: today,
-        },
-    });
-
-    const todayHistory = response.data?.[0] ?? null;
-
-    if (todayHistory?.checkInTime) {
+    if (!canCheckIn(todayHistory)) {
         return todayHistory;
     }
 
@@ -109,7 +78,7 @@ export const checkIn = async () => {
         const patchResponse = await axiosInstance.patch(
             `/history/${todayHistory.id}`,
             {
-                // 출근 시간만 반영
+                // 출근 시간 반영
                 checkInTime: currentTime,
                 attendanceStatus: ATTENDANCE_STATUS.NORMAL,
             }
@@ -132,20 +101,13 @@ export const checkIn = async () => {
 export const checkOut = async () => {
     const today = getTodayDateString();
     const currentTime = getCurrentTimeString();
+    const todayHistory = await fetchTodayHistory(today);
 
-    const response = await axiosInstance.get("/history", {
-        params: {
-            workDate: today,
-        },
-    });
-
-    const todayHistory = response.data?.[0] ?? null;
-
-    if (!todayHistory?.id || !todayHistory?.checkInTime) {
+    if (!canCheckOut(todayHistory)) {
         throw new Error("checkIn record is required before checkOut");
     }
 
-    if (todayHistory.checkOutTime) {
+    if (hasCheckedOut(todayHistory)) {
         return todayHistory;
     }
 
@@ -155,12 +117,12 @@ export const checkOut = async () => {
             getMinutesFromTime(todayHistory.checkInTime)
     );
 
-    // 근무 시간 기준 상태 계산은 utils 로 분리
     const attendanceStatus = getAttendanceStatusByWorkMinutes(workMinutes);
 
     const patchResponse = await axiosInstance.patch(
         `/history/${todayHistory.id}`,
         {
+            // 퇴근 처리 데이터 반영
             checkOutTime: currentTime,
             workMinutes,
             attendanceStatus,

@@ -27,6 +27,39 @@ export const formatVacationDays = (days) => {
     return `${days}`.replace(/\.0$/, "");
 };
 
+export const getTodayDateString = () => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+export const getCurrentTimeString = () => {
+    const now = new Date();
+
+    const hour = String(now.getHours()).padStart(2, "0");
+    const minute = String(now.getMinutes()).padStart(2, "0");
+
+    return `${hour}:${minute}`;
+};
+
+export const getMinutesFromTime = (timeText) => {
+    if (!timeText) return 0;
+
+    const [hourText = "0", minuteText = "0"] = String(timeText).split(":");
+    const hour = Number(hourText);
+    const minute = Number(minuteText);
+
+    if (Number.isNaN(hour) || Number.isNaN(minute)) {
+        return 0;
+    }
+
+    return hour * 60 + minute;
+};
+
 export const getAttendanceStatusByWorkMinutes = (workMinutes) => {
     const safeWorkMinutes = toSafeNumber(workMinutes);
 
@@ -39,6 +72,18 @@ export const getAttendanceStatusByWorkMinutes = (workMinutes) => {
     }
 
     return ATTENDANCE_STATUS.NORMAL;
+};
+
+export const canCheckIn = (todayHistory) => {
+    return !todayHistory?.checkInTime;
+};
+
+export const canCheckOut = (todayHistory) => {
+    return Boolean(todayHistory?.id && todayHistory?.checkInTime);
+};
+
+export const hasCheckedOut = (todayHistory) => {
+    return Boolean(todayHistory?.checkOutTime);
 };
 
 export const getKoreanTodayLabel = (date) => {
