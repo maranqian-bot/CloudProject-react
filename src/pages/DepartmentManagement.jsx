@@ -12,6 +12,7 @@ function DepartmentManagement() {
         isLoading,
         goToNextPage,
         goToPrevPage,
+        goToPage,
         currentPage,
         totalPages
     } = useDepartmentList(5);
@@ -87,8 +88,10 @@ function DepartmentManagement() {
                                             <td className="name-cell">{dept.deptName}</td>
                                             <td>
                                                 <div className="manager-cell">
-                                                    <div className="avatar-shell">{dept.managerDisplayText.charAt(0)}</div>
-                                                    <span>{dept.managerDisplayText}</span>
+                                                    <div className="avatar-shell">
+                                                        {dept.managerId ? "ID" : "?"}
+                                                    </div>
+                                                    <span>{dept.managerId ? dept.managerId : "미지정"}</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -123,7 +126,15 @@ function DepartmentManagement() {
                                 </button>
 
                                 {/* 현재 페이지 표시 */}
-                                <button className="page-btn active">{currentPage}</button>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                                    <button
+                                        key={pageNum}
+                                        className={`page-btn ${currentPage === pageNum ? "active" : ""}`}
+                                        onClick={() => goToPage(pageNum)} // 해당 번호 누르면 이동
+                                    >
+                                        {pageNum}
+                                    </button>
+                                ))}
 
                                 {/* 다음 버튼 */}
                                 <button

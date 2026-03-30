@@ -28,7 +28,7 @@ function App() {
 
         <Route path="/department-management" element={<DepartmentManagement />} />
         <Route path="/department-create" element={<DepartmentCreate />} />
-        <Route path="/department-edit" element={<DepartmentEdit />} />
+        <Route path="/department-edit/:deptid" element={<DepartmentEdit />} />
 
         <Route path="/attendance-management" element={<AttendanceManagement />} />
 

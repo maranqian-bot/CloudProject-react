@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useDepartmentDerivedState } from "../useDepartmentDerivedState";
+import { useDepartmentQuery } from "../query/departmentQuery";
+import { useDepartmentDerivedState } from "./useDepartmentDerivedState";
 
 // 부서 관리 통합 훅 (부서 목록)
 export const useDepartmentList = (itemsPerPage = 5) => {
@@ -7,7 +8,7 @@ export const useDepartmentList = (itemsPerPage = 5) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   //서버 데이터 가져오기 (Spring 0부터 시작하므로 -1)
-  const { data, isLoading, isError } = useDepartmentList(
+  const { data, isLoading, isError, refetch } = useDepartmentQuery(
     currentPage - 1, itemsPerPage
   );
 
