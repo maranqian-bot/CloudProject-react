@@ -126,6 +126,7 @@ function DepartmentCreate() {
                                     <span className="material-symbols-outlined">info</span>
                                     <h3>부서 등록 안내</h3>
                                 </div>
+                            
                                 <ul className="info-list">
                                     <li>
                                         <span className="dot">•</span>
