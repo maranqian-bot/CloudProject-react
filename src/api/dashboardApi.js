@@ -1,24 +1,4 @@
 import axiosInstance from "./axiosInstance";
-import {
-    ATTENDANCE_STATUS,
-    canCheckIn,
-    canCheckOut,
-    getAttendanceStatusByWorkMinutes,
-    getCurrentTimeString,
-    getMinutesFromTime,
-    getTodayDateString,
-    hasCheckedOut,
-} from "../utils/dashboardUtils";
-
-const fetchTodayHistory = async (workDate) => {
-    const response = await axiosInstance.get("/history", {
-        params: {
-            workDate,
-        },
-    });
-
-    return response.data?.[0] ?? null;
-};
 
 export const getDashboardSummary = async () => {
     const [summaryResponse, currentEmployeeResponse, vacationRequestsResponse] =
@@ -35,12 +15,21 @@ export const getDashboardSummary = async () => {
     };
 };
 
-export const getTodayAttendance = async () => {
-    const today = getTodayDateString();
-    const todayHistory = await fetchTodayHistory(today);
+export const getTodayHistory = async ({ workDate }) => {
+    const response = await axiosInstance.get("/history", {
+        params: {
+            workDate,
+        },
+    });
+
+    return response.data?.[0] ?? null;
+};
+
+export const getTodayAttendance = async ({ workDate }) => {
+    const todayHistory = await getTodayHistory({ workDate });
 
     return {
-        workDate: today,
+        workDate,
         isCheckedIn: Boolean(todayHistory?.checkInTime),
         isCheckedOut: Boolean(todayHistory?.checkOutTime),
         checkInTime: todayHistory?.checkInTime ?? null,
@@ -65,69 +54,45 @@ export const getRecentActivities = async ({ page, limit }) => {
     };
 };
 
-export const checkIn = async () => {
-    const today = getTodayDateString();
-    const currentTime = getCurrentTimeString();
-    const todayHistory = await fetchTodayHistory(today);
+export const checkIn = async ({
+    historyId,
+    workDate,
+    checkInTime,
+    attendanceStatus,
+}) => {
+    if (historyId) {
+        const response = await axiosInstance.patch(`/history/${historyId}`, {
+            // 출근 시간 반영
+            checkInTime,
+            attendanceStatus,
+        });
 
-    if (!canCheckIn(todayHistory)) {
-        return todayHistory;
+        return response.data;
     }
 
-    if (todayHistory?.id) {
-        const patchResponse = await axiosInstance.patch(
-            `/history/${todayHistory.id}`,
-            {
-                // 출근 시간 반영
-                checkInTime: currentTime,
-                attendanceStatus: ATTENDANCE_STATUS.NORMAL,
-            }
-        );
-
-        return patchResponse.data;
-    }
-
-    const createResponse = await axiosInstance.post("/history", {
-        workDate: today,
-        checkInTime: currentTime,
+    const response = await axiosInstance.post("/history", {
+        workDate,
+        checkInTime,
         checkOutTime: null,
         workMinutes: null,
-        attendanceStatus: ATTENDANCE_STATUS.NORMAL,
+        attendanceStatus,
     });
 
-    return createResponse.data;
+    return response.data;
 };
 
-export const checkOut = async () => {
-    const today = getTodayDateString();
-    const currentTime = getCurrentTimeString();
-    const todayHistory = await fetchTodayHistory(today);
+export const checkOut = async ({
+    historyId,
+    checkOutTime,
+    workMinutes,
+    attendanceStatus,
+}) => {
+    const response = await axiosInstance.patch(`/history/${historyId}`, {
+        // 퇴근 처리 데이터 반영
+        checkOutTime,
+        workMinutes,
+        attendanceStatus,
+    });
 
-    if (!canCheckOut(todayHistory)) {
-        throw new Error("checkIn record is required before checkOut");
-    }
-
-    if (hasCheckedOut(todayHistory)) {
-        return todayHistory;
-    }
-
-    const workMinutes = Math.max(
-        0,
-        getMinutesFromTime(currentTime) -
-            getMinutesFromTime(todayHistory.checkInTime)
-    );
-
-    const attendanceStatus = getAttendanceStatusByWorkMinutes(workMinutes);
-
-    const patchResponse = await axiosInstance.patch(
-        `/history/${todayHistory.id}`,
-        {
-            // 퇴근 처리 데이터 반영
-            checkOutTime: currentTime,
-            workMinutes,
-            attendanceStatus,
-        }
-    );
-
-    return patchResponse.data;
+    return response.data;
 };

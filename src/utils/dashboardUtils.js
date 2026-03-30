@@ -27,21 +27,17 @@ export const formatVacationDays = (days) => {
     return `${days}`.replace(/\.0$/, "");
 };
 
-export const getTodayDateString = () => {
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
+export const formatDateToKey = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
 };
 
-export const getCurrentTimeString = () => {
-    const now = new Date();
-
-    const hour = String(now.getHours()).padStart(2, "0");
-    const minute = String(now.getMinutes()).padStart(2, "0");
+export const formatTimeToKey = (date) => {
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
 
     return `${hour}:${minute}`;
 };
@@ -74,16 +70,16 @@ export const getAttendanceStatusByWorkMinutes = (workMinutes) => {
     return ATTENDANCE_STATUS.NORMAL;
 };
 
-export const canCheckIn = (todayHistory) => {
-    return !todayHistory?.checkInTime;
-};
+export const getAttendanceStatusLabel = ({ isCheckedIn, isCheckedOut }) => {
+    if (isCheckedOut) {
+        return "퇴근 완료";
+    }
 
-export const canCheckOut = (todayHistory) => {
-    return Boolean(todayHistory?.id && todayHistory?.checkInTime);
-};
+    if (isCheckedIn) {
+        return "출근 완료";
+    }
 
-export const hasCheckedOut = (todayHistory) => {
-    return Boolean(todayHistory?.checkOutTime);
+    return "출근 전";
 };
 
 export const getKoreanTodayLabel = (date) => {
@@ -109,18 +105,6 @@ export const getDisplayTime = (date) => {
         currentTime: `${String(displayHour).padStart(2, "0")}:${minute}`,
         meridiem,
     };
-};
-
-export const getAttendanceStatusLabel = ({ isCheckedIn, isCheckedOut }) => {
-    if (isCheckedOut) {
-        return "퇴근 완료";
-    }
-
-    if (isCheckedIn) {
-        return "출근 완료";
-    }
-
-    return "출근 전";
 };
 
 export const formatWorkDate = (dateString) => {
@@ -184,51 +168,6 @@ export const mapRecentActivityItem = (item) => {
 
 export const getRecentActivityItems = (items) => {
     return (items ?? []).map(mapRecentActivityItem);
-};
-
-export const getPendingApprovalCount = (vacationRequests) => {
-    return (vacationRequests ?? []).filter((item) => item.status === "PENDING")
-        .length;
-};
-
-export const getUsedVacationDays = ({
-    vacationRequests,
-    employeeId,
-    currentYear,
-}) => {
-    return (vacationRequests ?? [])
-        .filter(
-            (item) =>
-                item.employeeId === employeeId &&
-                item.status === "APPROVED" &&
-                item.startDate
-        )
-        .filter((item) => {
-            const startDate = new Date(item.startDate);
-
-            if (Number.isNaN(startDate.getTime())) {
-                return false;
-            }
-
-            return startDate.getFullYear() === currentYear;
-        })
-        .reduce((acc, item) => acc + toSafeNumber(item.days), 0);
-};
-
-export const getVacationProgressPercent = ({
-    remainingVacationDays,
-    usedVacationDays,
-}) => {
-    const totalVacationDays = remainingVacationDays + usedVacationDays;
-
-    if (totalVacationDays <= 0) {
-        return 0;
-    }
-
-    return Math.min(
-        100,
-        Math.max(0, (remainingVacationDays / totalVacationDays) * 100)
-    );
 };
 
 export const getPaginationState = ({

@@ -9,7 +9,11 @@ import {
 
 export const DASHBOARD_QUERY_KEYS = {
     DASHBOARD_SUMMARY: ["dashboardSummary"],
-    TODAY_ATTENDANCE: ["todayAttendance"],
+    TODAY_ATTENDANCE_BASE: ["todayAttendance"],
+    TODAY_ATTENDANCE: ({ workDate }) => [
+        ...DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE_BASE,
+        workDate,
+    ],
     RECENT_ACTIVITIES_BASE: ["dashboardRecentActivities"],
     RECENT_ACTIVITIES: ({ page, limit }) => [
         ...DASHBOARD_QUERY_KEYS.RECENT_ACTIVITIES_BASE,
@@ -25,10 +29,11 @@ export const useDashboardSummaryQuery = () => {
     });
 };
 
-export const useTodayAttendanceQuery = () => {
+export const useTodayAttendanceQuery = ({ workDate }) => {
     return useQuery({
-        queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE,
-        queryFn: getTodayAttendance,
+        queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE({ workDate }),
+        queryFn: () => getTodayAttendance({ workDate }),
+        enabled: Boolean(workDate),
     });
 };
 
@@ -50,7 +55,7 @@ const useDashboardMutation = (mutationFn) => {
             });
 
             queryClient.invalidateQueries({
-                queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE,
+                queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE_BASE,
             });
 
             queryClient.invalidateQueries({
