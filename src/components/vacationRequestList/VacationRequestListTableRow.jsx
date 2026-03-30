@@ -3,7 +3,7 @@ import {
     getStatusClass,
     getAvatarText,
     formatDateRange,
-    formatDays,
+    formatVacationDays,
 } from "../../utils/vacationRequestUtils";
 
 function VacationRequestListTableRow({
@@ -47,7 +47,7 @@ function VacationRequestListTableRow({
                     <p className="date">
                         {formatDateRange(item.startDate, item.endDate)}
                     </p>
-                    <p className="duration">{formatDays(item.days)}</p>
+                    <p className="duration">{formatVacationDays(item.days)}</p>
                 </div>
             </td>
 

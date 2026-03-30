@@ -22,7 +22,7 @@ export const useVacationRequestDerivedState = ({
         currentEmployee?.availableVacationDays
     );
 
-    const remainingVacationDays = Math.max(
+    const expectedRemainingVacationDays = Math.max(
         availableVacationDays - selectedDays,
         0
     );
@@ -32,7 +32,7 @@ export const useVacationRequestDerivedState = ({
     )}일`;
 
     const requestAfterApprovalText = `* 이번 신청 승인 시 ${formatVacationDays(
-        remainingVacationDays
+        expectedRemainingVacationDays
     )}일이 남게 됩니다.`;
 
     const showOtherReason = formData.vacationType === "기타";
@@ -40,7 +40,7 @@ export const useVacationRequestDerivedState = ({
     return {
         selectedDays,
         availableVacationDays,
-        remainingVacationDays,
+        expectedRemainingVacationDays,
         availableVacationText,
         requestAfterApprovalText,
         showOtherReason,

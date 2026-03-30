@@ -1,7 +1,7 @@
-import { formatVacationDays } from "./utils/vacationRequestUtils";
+import { formatVacationDays } from "../../utils/vacationRequestUtils";
 
 function VacationManagementSummary({
-    remainingVacationDays,
+    availableVacationDays,
     usedVacationDays,
     pendingApprovalCount,
 }) {
@@ -10,7 +10,7 @@ function VacationManagementSummary({
             <div className="stat-card wide">
                 <p className="stat-label">잔여 휴가</p>
                 <div className="stat-value">
-                    {formatVacationDays(remainingVacationDays)}
+                    {formatVacationDays(availableVacationDays)}
                 </div>
                 <p className="stat-desc">현재 사용자 기준 잔여 휴가</p>
             </div>

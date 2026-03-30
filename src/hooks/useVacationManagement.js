@@ -4,7 +4,7 @@ import {
     useCurrentEmployeeQuery,
     useRejectVacationRequestMutation,
     useVacationRequestListQuery,
-} from "./query/vacationQuery";
+} from "../query/vacationQuery";
 
 const ALL_ITEMS_LIMIT = 999;
 const ITEMS_PER_PAGE = 5;
@@ -117,7 +117,7 @@ export const useVacationManagement = () => {
             safeCurrentPage,
             startItemNumber,
             endItemNumber,
-            remainingVacationDays: currentEmployee?.remainingVacationDays ?? 0,
+            availableVacationDays: currentEmployee?.availableVacationDays ?? 0,
             usedVacationDays,
             pendingApprovalCount: myPendingApprovals.length,
             myPendingApprovals,
@@ -168,7 +168,7 @@ export const useVacationManagement = () => {
         totalPages: viewModel.totalPages,
         startItemNumber: viewModel.startItemNumber,
         endItemNumber: viewModel.endItemNumber,
-        remainingVacationDays: viewModel.remainingVacationDays,
+        availableVacationDays: viewModel.availableVacationDays,
         usedVacationDays: viewModel.usedVacationDays,
         pendingApprovalCount: viewModel.pendingApprovalCount,
         myPendingApprovals: viewModel.myPendingApprovals,
