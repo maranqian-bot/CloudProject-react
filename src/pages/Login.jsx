@@ -77,7 +77,7 @@ function Login() {
                 localStorage.setItem("loginUser", JSON.stringify(loginUser));
 
                 setUser(loginUser);
-                navigate("/");
+                navigate("/"); 
             },
             onError: (error) => {
                 const message = error?.response?.data?.message || "사번 또는 비밀번호를 확인해주세요.";
