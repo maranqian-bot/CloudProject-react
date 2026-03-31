@@ -5,18 +5,12 @@ import { reissueApi } from "./authApi";
 // const API_BASE_URL = 'http://dxx91bct0u6rt.cloudfront.net';
 
 const axiosInstance = axios.create({
-<<<<<<< HEAD
-    
-    baseURL : "http://localhost:8080",
-    // baseURL: "http://localhost:3001",
-    withCredentials: true,
-=======
     baseURL: "http://localhost:8080",
     timeout: 10000,
     headers: {
         "Content-Type": "application/json"
     },
->>>>>>> 50bac1af7476c01f3368d339c913e17558f2e271
+    withCredentials: true
 });
 
 
