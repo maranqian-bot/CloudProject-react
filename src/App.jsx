@@ -14,8 +14,27 @@ import MemberEdit from "./pages/MemberEdit.jsx";
 import Login from "./pages/Login.jsx";
 import FindPassword from "./pages/FindPassword.jsx";
 import ItContact from "./pages/ItContact.jsx";
+import useAuthStore from "./store/authStore.js";
+import { useEffect } from "react";
 
 function App() {
+  const { setUser } = useAuthStore();
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    const savedUser = localStorage.getItem("loginUser");
+    
+    if (accessToken && savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("저장된 사용자 정보 파싱 실패: ", error);
+        localStorage.removeItem("loginUser");
+      }
+    }
+  }, [setUser]);
+  
   return (
     <Router>
       <Routes>

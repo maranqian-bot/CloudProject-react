@@ -1,8 +1,90 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/login.css?inline";
+import useAuthStore from "../store/authStore.js";
+import { useLoginMutation } from "../query/loginMutation.js";
+import { useState } from "react";
 
 function Login() {
+    const navigate = useNavigate();
+    const { setUser } = useAuthStore();
+    const { mutate: loginMutate, isPending } = useLoginMutation();
+
+    const [form, setForm] = useState({
+        employeeNumber: "",
+        password: "",
+        remember: false,
+    });
+
+    const [errorMessage, setErrormessage] = useState("");
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setErrormessage("");
+
+        if (!form.employeeNumber.trim()) {
+            setErrormessage("사번을 입력해주세요.");
+            return;
+        }
+        
+        if (!form.password.trim()) {
+            setErrormessage("비밀번호를 입력해주세요.");
+            return;
+        }
+
+        const requestData = {
+            employeeNumber: form.employeeNumber,
+            password: form.password,
+        }
+
+        loginMutate(requestData, {
+            onSuccess: (response) => {
+                console.log("로그인 응답 전체: ", response);
+
+                const responseData = response?.data?.data ?? response?.data ?? response;
+
+                console.log("토큰 payload: ", responseData);
+                
+                const accessToken = responseData?.accessToken;
+                const refreshToken = responseData?.refreshToken;
+            
+                const loginUser = {
+                    employeeNumber: responseData?.employeeNumber,
+                    name: responseData?.name,
+                };
+
+                if (!accessToken) {
+                    setErrormessage("토큰이 저장되지 않았습니다.");
+                    console.error("accessToken 없음: ", responseData);
+                    return;
+                }
+
+                localStorage.setItem("accessToken", accessToken);
+
+                if (refreshToken) {
+                    localStorage.setItem("refreshToken", refreshToken);
+                }
+
+                localStorage.setItem("loginUser", JSON.stringify(loginUser));
+
+                setUser(loginUser);
+                navigate("/"); 
+            },
+            onError: (error) => {
+                const message = error?.response?.data?.message || "사번 또는 비밀번호를 확인해주세요.";
+                setErrormessage(message);
+            }
+        })
+    }
     return (
         <>
             <div className="main-wrapper">
@@ -21,7 +103,7 @@ function Login() {
                     </div>
 
                     <div className="login-card">
-                        <form onSubmit={(e) => e.preventDefault()}>
+                        <form onSubmit={handleSubmit}>
                             <div className="form-group">
                                 <div className="form-label-row">
                                     <label className="label-text" htmlFor="login_id">
@@ -39,10 +121,12 @@ function Login() {
                                     </div>
                                     <input
                                         className="form-input"
-                                        id="login_id"
-                                        name="login_id"
-                                        placeholder="사번 또는 이메일"
+                                        id="employeeNumber"
+                                        name="employeeNumber"
+                                        placeholder="사번 입력 (예: EMP-2024-02)"
                                         type="text"
+                                        value={form.employeeNumber}
+                                        onChange={handleChange}
                                     />
                                 </div>
                             </div>
@@ -69,8 +153,10 @@ function Login() {
                                         className="form-input"
                                         id="password"
                                         name="password"
-                                        placeholder="••••••••"
+                                        placeholder="예: Qwer1234!"
                                         type="password"
+                                        value={form.password}
+                                        onChange={handleChange}
                                     />
                                 </div>
                             </div>
@@ -81,14 +167,24 @@ function Login() {
                                     id="remember"
                                     name="remember"
                                     type="checkbox"
+                                    checked={form.remember}
+                                    onChange={handleChange}
                                 />
                                 <label className="checkbox-label" htmlFor="remember">
                                     로그인 상태 유지
                                 </label>
                             </div>
 
-                            <button className="login-button" type="submit">
-                                <span>로그인</span>
+                            {errorMessage && (
+                                <p style={{color: "#dc2626",
+                                           fontSize: "14px",
+                                           marginBottom: "12px",}}>
+                                    {errorMessage}
+                                </p>
+                            )}
+
+                            <button className="login-button" type="submit" disabled={isPending}>
+                                <span>{isPending ? "로그인 중..." : "로그인"}</span>
                                 <span
                                     className="material-symbols-outlined"
                                     data-icon="arrow_forward"

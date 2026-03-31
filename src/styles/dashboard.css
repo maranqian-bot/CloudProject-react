@@ -2397,7 +2397,16 @@ footer {
     font-weight: 500;
     opacity: 0.4;
 }
+/* vaactionManagement 상테 카드 */
+.vacation-management-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
 
-/* Login */
+.vacation-management-summary .stat-card {
+    min-width: 0;
+}
 
 

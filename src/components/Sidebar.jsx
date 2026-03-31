@@ -1,5 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../api/logout";
 function Sidebar() {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+    
     return(
         <aside className="sidebar">
         <div className="sidebar-header">
@@ -45,10 +53,10 @@ function Sidebar() {
             <span className="material-symbols-outlined">help</span>
             문의 하기
             </Link>
-            <Link className="nav-link logout" to="/login">
+            <button type="button" className="nav-link logout" onClick={handleLogout}>  
             <span className="material-symbols-outlined">logout</span>
             로그아웃
-            </Link>
+            </button>
         </div>
         </aside>
     )
