@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 // 초기 데이터 구조 (부서 관리용)
 const INITIAL_DEPT_DATA = {
+  departmentId: null,
   deptCode: "",
   deptName: "",
   managerId: "",

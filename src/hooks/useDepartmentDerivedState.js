@@ -21,14 +21,12 @@ export const useDepartmentDerivedState = (data, currentPage, itemsPerPage) => {
 
         // 컴포넌트에서 "전체 {totalCount}개 중..."이 아닌 훅에서 완성하는 걸로 구현.
         const paginationText = `전체 ${totalCount.toLocaleString()}개 중 ${startItemNumber}~${endItemNumber}번째 표시 중`;
-        
         const pageStatusText = `${currentPage} / ${totalPages} 페이지`;
 
         // 부서 목록 데이터 추가 가공 (예: 부서장이 없으면 '미지정' 텍스트 처리)
         const processedList = list.map(dept => ({
             ...dept,
-            managerDisplayText: dept.managerName || "미지정",
-            statusDisplayText: dept.status === "ACTIVE" ? "운영중" : "중지"
+            managerDisplayText: dept.managerId || "미지정",
         }));
 
         return {

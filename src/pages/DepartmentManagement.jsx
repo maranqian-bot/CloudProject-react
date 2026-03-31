@@ -69,48 +69,65 @@ function DepartmentManagement() {
                                 <tr>
                                     <th>코드</th>
                                     <th>부서명</th>
-                                    <th>부서장</th>
                                     <th>인원</th>
-                                    <th>평균 근속</th>
+                                    <th>관리자</th>
                                     <th style={{ textAlign: "right" }}>관리</th>
                                 </tr>
                             </thead>
 
-                            <tbody>
-                                {isLoading ? (
-                                    <tr><td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>데이터를 불러오는 중입니다... ⏳</td></tr>
-                                ) : list.length === 0 ? (
-                                    <tr><td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>등록된 부서가 없습니다. 텅~ 📭</td></tr>
-                                ) : (
-                                    list.map((dept) => (
-                                        <tr key={dept.deptid}>
-                                            <td className="code-cell">{dept.deptCode}</td>
-                                            <td className="name-cell">{dept.deptName}</td>
-                                            <td>
-                                                <div className="manager-cell">
-                                                    <div className="avatar-shell">
-                                                        {dept.managerId ? "ID" : "?"}
+                                <tbody>
+                                    {isLoading ? (
+                                        // 컬럼 개수에 맞춰 colSpan을 5로 설정
+                                        <tr><td colSpan="5" style={{ textAlign: "center", padding: "60px" }}>데이터를 불러오는 중입니다... ⏳</td></tr>
+                                    ) : list.length === 0 ? (
+                                        <tr><td colSpan="5" style={{ textAlign: "center", padding: "60px" }}>등록된 부서가 없습니다... 📭</td></tr>
+                                    ) : (
+                                        list.map((dept) => (
+                                            <tr key={dept.departmentId}>
+                                                {/* 부서 코드: 배지 스타일 (ENG-001) */}
+                                                <td>
+                                                    <span className="code-badge">{dept.deptCode}</span>
+                                                </td>
+
+                                                {/* 부서명: 이름 + 하단에 흐린 설명 텍스트 */}
+                                                <td>
+                                                    <div className="name-container">
+                                                        <div className="main-name">{dept.deptName}</div>
+                                                        <div className="sub-description">{dept.description || "상세 설명이 없습니다."}</div>
                                                     </div>
-                                                    <span>{dept.managerId ? dept.managerId : "미지정"}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className={`status-badge ${dept.status === 'ACTIVE' ? 'status-blue' : 'status-gray'}`}>
-                                                    {dept.statusDisplayText}
-                                                </span>
-                                            </td>
-                                            <td style={{ textAlign: "right" }}>
-                                                <button
-                                                    className="btn-edit"
-                                                    onClick={() => (window.location.href = `/department-edit/${dept.deptid}`)}
-                                                >
-                                                    상세 보기
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
+                                                </td>
+
+                                                {/* 인원: 이미지처럼 숫자만 깔끔하게 (우선 하드코딩 혹은 0) */}
+                                                <td>{dept.employeeCount || 0} 명</td>
+
+                                                {/* 관리자: 아바타 원형 + 이름/직책 정보 */}
+                                                <td>
+                                                    <div className="manager-info-wrapper">
+                                                        <div className="avatar-circle">
+                                                            {/* 사번의 첫 글자를 아바타로 사용하거나 아이콘 표시 */}
+                                                            {dept.managerId ? dept.managerId.charAt(0) : "?"}
+                                                        </div>
+                                                        <div className="manager-text-group">
+                                                            <div className="manager-name">{dept.managerDisplayText}</div>
+                                                            <div className="manager-role">부서 책임자</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                {/* 관리: 이미지에 있던 수정(Edit) 아이콘 버튼 스타일 */}
+                                                <td style={{ textAlign: "right" }}>
+                                                    <button
+                                                        className="action-icon-btn"
+                                                        onClick={() => (window.location.href = `/department-edit/${dept.departmentId}`)}
+                                                        title="상세 보기"
+                                                    >
+                                                        <span className="material-symbols-outlined">edit_square</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
                         </table>
 
                         <div className="table-footer">

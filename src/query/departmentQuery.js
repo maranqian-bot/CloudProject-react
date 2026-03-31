@@ -17,17 +17,17 @@ export const useCreateDepartmentMutation = () => {
 export const useDepartmentQuery = (page, size) => {
   return useQuery({
     queryKey:["departments", page, size],
-    queryFn: () => getDepartmentListApi(page, size),
+    queryFn: () => getDepartmentListApi(page, size, "departmentId,desc"),
     keepPreviousData: true,
   });
 };
 
 // 부서 상세 조회 Query
-export const useDepartmentDetailQuery = (deptid) => {
+export const useDepartmentDetailQuery = (departmentId) => {
   return useQuery({
-    queryKey:["department", deptid],
-    queryFn: () => getDepartmentDetailApi(deptid),
-    enabled: !!deptid,   // deptid가 있을 때만 실행
+    queryKey:["department", departmentId],
+    queryFn: () => getDepartmentDetailApi(departmentId),
+    enabled: !!departmentId,   // departmentId가 있을 때만 실행
   });
 };
 
@@ -35,10 +35,10 @@ export const useDepartmentDetailQuery = (deptid) => {
 export const useUpdateDepartmentMutation = () => { 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ deptid, data }) => updateDepartmentApi(deptid, data), 
-    onSuccess: (data, variables) => {
+    mutationFn: ({ departmentId, requestDto }) => updateDepartmentApi(departmentId, requestDto ), 
+    onSuccess: ( data , variables) => {
       queryClient.invalidateQueries(["departments"]);
-      queryClient.invalidateQueries(["department", variables.deptid]); //캐시 갱신
+      queryClient.invalidateQueries(["department", variables.departmentId]); //캐시 갱신
     },
   });
 };
