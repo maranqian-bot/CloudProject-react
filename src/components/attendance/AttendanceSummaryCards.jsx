@@ -38,7 +38,7 @@ function AttendanceSummaryCards({ summary }) {
                     </div>
                     <div>
                     <p className="stat-value">
-                        {summary?.lateCount} <span className="stat-unit">번</span>
+                        {summary?.lateCount} <span className="stat-unit">회</span>
                     </p>
                     <p className="stat-label">지각 횟수</p>
                     </div>

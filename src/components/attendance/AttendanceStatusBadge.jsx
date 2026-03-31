@@ -3,10 +3,11 @@
 const AttendanceStatusBadge = ({ status }) => {
     const statusMap = {
         NORMAL: { label: "정상", color: "#15803d", bg: "#dcfce7" },
-	    LATE: { label: "지각", color: "#b91c1c", bg: "#fee2e2" },
-	    EARLYLEAVE: { label: "조퇴", color: "#b45309", bg: "#fef3c7" },
+	    LATE: { label: "지각", color: "#b45309", bg: "#fef3c7" },
+	    EARLY_LEAVE: { label: "조퇴", color: "#b45309", bg: "#fef3c7" },
 	    VACATION: { label: "휴가", color: "#374151", bg: "#f3f4f6" },
-	    OVERTIME: { label: "연장 근무", color: "#1d4ed8", bg: "#dbeafe" }
+	    ABSENT: { label: "결근", color: "#b91c1c", bg: "#fee2e2" },
+        OVER_TIME: { label: "연장 근무", color: "#1d4ed8", bg: "#dbeafe" }
     };
 
 

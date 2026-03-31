@@ -12,12 +12,6 @@ import AttendanceHistoryTable from "../components/attendance/AttendanceHistoryTa
 import { usePagination } from "../hooks/usePagination.js";
 
 function AttendanceManagement() {
-  // TODO : 백엔드 구현 후 query 호출해야 됨
-  //      : 백엔드 구현할 때 CORS 설정해줘야 됨
-  //      : - 페이징 처리 해야 됨(3페이지씩 5행씩 보여줌)
-  //      : 엑셀 내보내기 기능 구현해야 됨
-  //      : 상태뱃지 스타일 적용 해야 됨
-  //      : 근태 관리 상승률과 하락률 계산해서 적용해야 됨 (시간남으면..)
 
   const {
     data: summaryData,
@@ -31,18 +25,20 @@ function AttendanceManagement() {
     isError: historyError,
   } = useAttendanceHistoryQuery();
 
+  const summary = summaryData?.data ?? {};
+  const history = Array.isArray(historyData?.data) ? historyData.data : [];
+
   // 페이지 훅 호출
   const {
     currentPage,
     totalPages,
-    currentData,
     pageNumbers,
     startItemNumber,
     endItemNumber,
     goToPage,
     goToPrevPage,
     goToNextPage,
-  } = usePagination(historyData, 5, 3);
+  } = usePagination(history, 5, 3);
 
   if (summaryLoading || historyLoading) {
     return <div>로딩 중...</div>;
@@ -68,10 +64,10 @@ function AttendanceManagement() {
           </div>
         </div>
         <div className="content-canvas">
-          <AttendanceSummaryCards summary={summaryData || {}} />
+          <AttendanceSummaryCards summary={summary} />
           <AttendanceHistoryTable
-            history={historyData}
-            totalCount={historyData.length}
+            history={history}
+            totalCount={history.length}
             startItemNumber={startItemNumber}
             endItemNumber={endItemNumber}
             currentPage={currentPage}
