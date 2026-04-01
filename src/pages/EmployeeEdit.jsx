@@ -2,8 +2,36 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/employee-edit.css?inline";
+import { useState } from "react";
 
 function EmployeeEdit() {
+
+    const [formData, setFormData] = useState({
+        employeeNumber : "",    // 사번 
+        name : "",              // 이름 
+        email : "",             // 이메일
+        password : "",          // 비밀번호
+        departmentId : "",      // 부서 Id
+        position : "",          // 직책
+        hireDate : "",          // 입사일
+        retireDate : "",        // 퇴사일
+        role : "",              // 시스템 역할
+        status : ""             // 상태
+
+    });  // 입력으로 저장하게 될 것 : formData
+
+    const handleChange = () => {      // 입력칸과의 연동을 위한 함수 : handleChange()
+        const { name, value }= e.target // 입력란에서, name과 value만 가져오기
+        setFormData({
+            ...formData,            // 입력 외에는 기본 값 유지...
+            [name] : value          // 입력이 들어온 태그에 대해서만 변경점 적용
+        });
+    };
+
+    const handleSubmit//  저장 확정시키기 : handleSubmit
+                     // -  formData를 확정시킴. setFormData로.  submit속성을 e.target에서 가져와야하지않을까?
+
+
     return (
         <>
             <Sidebar />
