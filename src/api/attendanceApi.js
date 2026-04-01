@@ -1,21 +1,19 @@
 import axiosInstance from "./axiosInstance"
 
-// 여기에서는 서버 통신만 하는 게 좋음 ui로직 xxxx
+const getEmployeeId = () => {
+    const employeeId = localStorage.getItem("employeeId");
 
-// 근태 요약 조회용 api
+    if (!employeeId) {
+        throw new Error("employeeId가 없습니다. 다시 로그인해주세요.");
+    }
 
+    return employeeId;
+};
 
-
-// JSON
-// {
-//     "workDays": 22,
-//     "lateCount": 3,
-//     "absentCount": 1,
-//     "attendanceScore": 94.8
-// }
 export const getAttendanceSummaryApi = async () => {
-    try { // ${employeeId} 수정 예정
-        const response = await axiosInstance.get(`/api/employees/1/attendance/summary`);
+    try { 
+        const employeeId = getEmployeeId();
+        const response = await axiosInstance.get(`/api/employees/${employeeId}/attendance/summary`);
         return response.data;
     } catch(e) {
         console.error(e);
@@ -23,19 +21,17 @@ export const getAttendanceSummaryApi = async () => {
     }
 };
 
-// 근태 이력 조회용 api(더미)
-// JSON
-// {
-//     "attendanceId": 1,
-//     "workDate": "2023-10-24",
-//     "checkInTime": "09:00",
-//     "chekcOutTime": "18:30",
-//     "workMinutes": 570,
-//     "attendanceStatus": "NORMAL"
-// }
-export const getAttendanceHistoryApi = async () => {
+export const getAttendanceHistoryApi = async (page = 0, size = 5) => {
     try {
-        const response = await axiosInstance.get(`/api/employees/1/attendance/history`);
+        const employeeId = getEmployeeId();
+        const response = await axiosInstance.get(`/api/employees/${employeeId}/attendance/history`, 
+            {
+                params: {
+                    page,
+                    size,
+                },
+            }
+        );
         return response.data;
     } catch(e) {
         console.error(e);
@@ -43,15 +39,16 @@ export const getAttendanceHistoryApi = async () => {
     }
 }
 
-// 근태 엑셀 다운로드 api
 export const downloadAttendanceExcelApi = async () => {
     try {
-        const response = await axiosInstance.get("/api/employees/1/attendance/excel", {
-            responseType: "blob", // 파일 형태로 받음
+        const employeeId = getEmployeeId();
+        const response = await axiosInstance.get("/api/employees/{employeeId}/attendance/excel", 
+        {
+            responseType: "blob", // 파일 형태로 받음  
         });
         return response.data;
     } catch(e) {
-        console.error(e);
+        console.error("근태 엑셀 다운로드 실패:", e);
         throw e;
     }
 }
