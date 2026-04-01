@@ -26,9 +26,13 @@ function AttendanceManagement() {
   } = useAttendanceHistoryQuery();
 
   const summary = summaryData?.data ?? {};
-  const history = Array.isArray(historyData?.data) ? historyData.data : [];
 
-  // 페이지 훅 호출
+  const history = Array.isArray(historyData?.data?.content) 
+  ? historyData.data.content 
+  : [];
+
+  const totalCount = historyData?.data?.totalElements ?? 0;
+
   const {
     currentPage,
     totalPages,
@@ -67,7 +71,7 @@ function AttendanceManagement() {
           <AttendanceSummaryCards summary={summary} />
           <AttendanceHistoryTable
             history={history}
-            totalCount={history.length}
+            totalCount={totalCount}
             startItemNumber={startItemNumber}
             endItemNumber={endItemNumber}
             currentPage={currentPage}

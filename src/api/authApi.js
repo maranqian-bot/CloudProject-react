@@ -11,6 +11,13 @@ export const loginApi = async (loginData) => {
     }
 }
 
+// export const forgetPasswordApi = async (employeeNumber) => {
+//     const response = await axios.post("/api/auth/forget-password", {
+//         employeeNumber,
+//     });
+//     return response.data;
+//     }
+
 export const reissueApi = async (refreshToken) => {
     const response = await axios.post("http://localhost:8080/api/auth/reissue", {
         refreshToken,
