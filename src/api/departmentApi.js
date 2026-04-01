@@ -27,9 +27,9 @@ export const getDepartmentListApi = async (page = 0, size = 5) => {
       params: {
         page: page,
         size: size,
-        sort: "departmentId,desc"  //  최근 등록순 정렬
+        sort: "departmentId"
       },
-    });
+    });                       
     // Spring Data Page 객체 그대로 반환 
     return response.data;
   } catch (error) {
