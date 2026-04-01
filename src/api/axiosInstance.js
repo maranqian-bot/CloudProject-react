@@ -17,10 +17,13 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         const accessToken = localStorage.getItem("accessToken");
+        console.log("현재 access Token: ", accessToken);
 
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
+
+        console.log("최종 요청 헤더: ", config.headers);
 
         return config;
     },
@@ -34,6 +37,9 @@ axiosInstance.interceptors.response.use(
 
     async (error) => {
         const originalRequest = error.config;
+
+        console.log("응답 에러 상태코드:", error.response?.status);
+        console.log("응답 에러 데이터:", error.response?.data);
 
         if(error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;

@@ -56,8 +56,10 @@ function Login() {
                 
                 const accessToken = responseData?.accessToken;
                 const refreshToken = responseData?.refreshToken;
+                const employeeId = responseData?.employeeId;
             
                 const loginUser = {
+                    employeeId: requestData?.accessToken,
                     employeeNumber: responseData?.employeeNumber,
                     name: responseData?.name,
                 };
@@ -68,12 +70,19 @@ function Login() {
                     return;
                 }
 
+                if (!employeeId) {
+                    setErrormessage("직원 정보가 올바르지 않습니다.");
+                    console.error("employeeId 없음: ", responseData);
+                    return;
+                }
+
                 localStorage.setItem("accessToken", accessToken);
 
                 if (refreshToken) {
                     localStorage.setItem("refreshToken", refreshToken);
                 }
 
+                localStorage.setItem("employeeId", String(employeeId));
                 localStorage.setItem("loginUser", JSON.stringify(loginUser));
 
                 setUser(loginUser);
@@ -107,7 +116,7 @@ function Login() {
                             <div className="form-group">
                                 <div className="form-label-row">
                                     <label className="label-text" htmlFor="login_id">
-                                        로그인 ID
+                                        사번 ID
                                     </label>
                                 </div>
                                 <div className="input-wrapper">
@@ -123,7 +132,7 @@ function Login() {
                                         className="form-input"
                                         id="employeeNumber"
                                         name="employeeNumber"
-                                        placeholder="사번 입력 (예: EMP-2024-02)"
+                                        placeholder="예: EMP-2024-001"
                                         type="text"
                                         value={form.employeeNumber}
                                         onChange={handleChange}
@@ -153,7 +162,7 @@ function Login() {
                                         className="form-input"
                                         id="password"
                                         name="password"
-                                        placeholder="예: Qwer1234!"
+                                        placeholder="예: 1234"
                                         type="password"
                                         value={form.password}
                                         onChange={handleChange}
