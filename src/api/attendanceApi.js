@@ -42,9 +42,9 @@ export const getAttendanceHistoryApi = async (page = 0, size = 5) => {
 export const downloadAttendanceExcelApi = async () => {
     try {
         const employeeId = getEmployeeId();
-        const response = await axiosInstance.get("/api/employees/{employeeId}/attendance/excel", 
+        const response = await axiosInstance.get(`/api/employees/${employeeId}/attendance/excel`, 
         {
-            responseType: "blob", // 파일 형태로 받음  
+            responseType: "blob",
         });
         return response.data;
     } catch(e) {
