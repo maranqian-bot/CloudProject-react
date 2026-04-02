@@ -11,7 +11,7 @@ export const useDepartmentDetail = (departmentId) => {
   const { formData, errors, handleInputChange, validateForm } = useDepartmentForm(detail);
 
   // 서버 전송 로직(수정/ 삭제)
-  const { handleSubmit, handleDelete, isSubmitting } = useDepartmentSubmit();
+  const { handleSubmit, handleDelete, isSubmitting, isDeleting } = useDepartmentSubmit();
 
   // 수정 버튼 클릭시 실행할 함수 종류
   const onUpdate = async() => {
