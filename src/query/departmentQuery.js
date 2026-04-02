@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createDepartmentApi, deleteDepartmentApi, getDepartmentDetailApi, getDepartmentListApi, updateDepartmentApi } from "../api/departmentApi";
 
 
@@ -8,19 +8,18 @@ export const useCreateDepartmentMutation = () => {
   return useMutation({
     mutationFn: createDepartmentApi,
     onSuccess: () => {
-      queryClient.invalidateQueries(["departments"]); // invalidateQueries: 등록 후 목록 갱신
+      queryClient.invalidateQueries({ queryKey: ["departments"]}); // invalidateQueries: 등록 후 목록 갱신
     },
   });
 };
 
 // 부서 목록 조회 Query
-export const useDepartmentQuery = (page, size, sort) => {
-  console.log("지금 들어온 page 값은?:", page, "타입은?:", typeof page);
+export const useDepartmentQuery = (page, size) => {
 
   return useQuery({
     queryKey:["departments", page, size],
     queryFn: () => getDepartmentListApi(page, size, "departmentId,desc"),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -37,8 +36,8 @@ export const useDepartmentDetailQuery = (departmentId) => {
 export const useUpdateDepartmentMutation = () => { 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ departmentId, requestDto }) => updateDepartmentApi(departmentId, requestDto ), 
-    onSuccess: ( data , variables) => {
+    mutationFn: ({ departmentId, data }) => updateDepartmentApi(departmentId, data), 
+    onSuccess: (data , variables) => {
       queryClient.invalidateQueries(["departments"]);
       queryClient.invalidateQueries(["department", variables.departmentId]); //캐시 갱신
     },
@@ -51,7 +50,7 @@ export const useDeleteDepartmentMutation = () => {
   return useMutation({
     mutationFn: deleteDepartmentApi,
     onSuccess: () => {
-      queryClient.invalidateQueries(["departments"]);
+      queryClient.invalidateQueries({ queryKey: ["departments"] });
     },
   });
 };

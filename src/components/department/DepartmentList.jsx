@@ -54,10 +54,7 @@ const DepartmentList = () => {
                     </div>
                   </td>
                   <td>
-                    <div className="manager-cell">
-                      <div className="initial-box">
-                        {dept.managerName ? dept.managerName.substring(0, 2).toUpperCase() : "??"}
-                      </div>
+                    <div className="manager-cell" style={{ gap: "0px" }}>
                       <div>
                         <div style={{ fontSize: "14px", fontWeight: "600" }}>
                           {dept.managerName || "미지정"} ({dept.managerId || "N/A"})
