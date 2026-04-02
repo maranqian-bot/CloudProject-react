@@ -8,7 +8,7 @@ const toSafeNumber = (value) => {
     return Number.isNaN(parsedValue) ? 0 : parsedValue;
 };
 
-export const useDepartmentDerivedState = (data, currentPage, itemsPerPage) => {
+export const useDepartmentDerivedState = (data, statsData, currentPage, itemsPerPage) => {
     return useMemo(() => {
         // 기본 데이터 가공 (방어 코드 포함)  
         const totalCount = toSafeNumber(data?.totalElements);  // 0부터 시작
@@ -19,13 +19,25 @@ export const useDepartmentDerivedState = (data, currentPage, itemsPerPage) => {
         const startItemNumber = totalCount === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
         const endItemNumber = Math.min(currentPage * itemsPerPage, totalCount);
 
+        // 통계 데이터 가공
+        const rawTotalEmployees = toSafeNumber(statsData?.totalEmployees);
+        
+        const stats = {
+            totalDepartments: toSafeNumber(statsData?.totalDepartments),
+            totalEmployees: toSafeNumber(statsData?.totalEmployees),
+            growthRate: toSafeNumber(statsData?.growthRate),
+            activeProjects: toSafeNumber(statsData?.activeProjects),
+            formattedTotalEmployees: rawTotalEmployees.toLocaleString()
+        };
+
         return {
             list,
             totalCount,
             totalPages,
             startItemNumber,
             endItemNumber,
+            stats,
             isEmpty: list.length === 0 // 데이터가 하나도 없는지 체크
         };
-    }, [data, currentPage, itemsPerPage]);
+    }, [data, statsData, currentPage, itemsPerPage]);
 };

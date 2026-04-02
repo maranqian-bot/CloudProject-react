@@ -7,9 +7,15 @@ import DepartmentList from "../components/department/DepartmentList.jsx";
 
 function DepartmentManagement() {
     const {
-        list,
-        isLoading
+        stats,
+        isLoading,
+        isStatsLoading
     } = useDepartmentList(5);
+
+    // 데이터가 없을 때 보여줄 로딩 화면
+    if (isLoading) {
+        return <div className="loading-container">데이터를 불러오는 중입니다...</div>;
+    }
 
     return (
         <>
@@ -27,7 +33,7 @@ function DepartmentManagement() {
                         <h1>부서 관리</h1>
                         <p>부서의 경계를 정의하고 리더를 배정하며 전체 조직의 리소스 분포를 모니터링합니다.</p>
                     </div>
-                    <button className="btn-add" onClick={() => window.location.href='./department-create'}>
+                    <button className="btn-add" onClick={() => window.location.href = './department-create'}>
                         <span className="material-symbols-outlined">add</span>
                         부서 추가
                     </button>
@@ -41,23 +47,31 @@ function DepartmentManagement() {
                                 <span className="stat-label">전체 부서 수</span>
                                 <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>analytics</span>
                             </div>
-                            <div className="stat-value">{isLoading? "-" : list.length}</div>
+                            <div className="stat-value">{isStatsLoading ? "-" : stats.totalDepartments}</div>
                         </div>
                         <p className="stat-desc">전역에서 활성화된 부서</p>
                     </div>
+
+                    {/* 인원 분포 카드 */}
                     <div className="stat-card narrow" style={{ backgroundColor: "var(--secondary-container)", border: "none" }}>
                         <span className="stat-label" style={{ color: "var(--on-secondary-container)" }}>인원 분포</span>
                         <div>
-                            <div className="stat-value" style={{ fontSize: "32px", color: "var(--on-secondary-container)" }}>1,248</div>
+                            <div className="stat-value" style={{ fontSize: "32px", color: "var(--on-secondary-container)" }}>
+                                {isStatsLoading ? "..." : stats.formattedTotalEmployees}
+                            </div>
                             <div className="progress-container" style={{ background: "rgba(255,255,255,0.3)" }}>
-                                <div className="progress-bar"></div>
+                                <div className="progress-bar" style={{ width: '45%' }}></div>
                             </div>
                         </div>
                     </div>
+
+                    {/* 성장률 카드 */}
                     <div className="stat-card narrow">
                         <span className="stat-label">평균 부서 성장률</span>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--primary)", marginTop: "16px" }}>
-                            <span className="stat-value" style={{ fontSize: "32px" }}>+14%</span>
+                            <span className="stat-value" style={{ fontSize: "32px" }}>
+                                {isStatsLoading ? "0" : `+${stats.growthRate}%`}
+                            </span>
                             <span className="material-symbols-outlined">trending_up</span>
                         </div>
                     </div>

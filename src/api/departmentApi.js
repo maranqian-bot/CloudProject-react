@@ -79,3 +79,17 @@ export const deleteDepartmentApi = async (departmentId) => {
     throw error;
   }
 };
+
+/**
+ * 부서 통계 (GET)
+ * @returns {Promise<Object>} - 부서 통계 정보 (ResDeptStatsDTO: totalDepartments, totalEmployees, growthRate, activeProjects)
+ */
+export const getDepartmentStatsApi = async () => {
+  try {
+    const response = await axiosInstance.get("/api/departments/stats");
+    return response.data;
+  } catch (error) {
+    console.error("부서 통계 조회 실패 : ", error);
+    throw error; 
+  }
+};
