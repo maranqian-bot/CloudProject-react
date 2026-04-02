@@ -9,6 +9,7 @@ const DepartmentList = () => {
 
   if (isLoading) return <div>로딩 중...</div>;
 
+  // 문자열 조합은 여기서 처리!
   const paginationText = `전체 ${totalCount.toLocaleString()}개 중 ${startItemNumber}~${endItemNumber}번째 표시 중`;
   const pageStatusText = `${currentPage} / ${totalPages} 페이지`;
 
