@@ -3,36 +3,76 @@ import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/employee-edit.css?inline";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import employeeQuery from "../query/employeeQuery.js";
 
-function EmployeeEdit() {
+function EmployeeEdit() {                   // 직원수정 메서드
+
+    const {
+        // 1. 데이터 및 기본 상태   ( 왼쪽: 실제데이터, 오른쪽: 별명 ) 
+        employee: reqDto,       // 수정요청 온 데이터
+        loading: isLoading,     // 로딩중(true)
+        isError,                // 에러 났는지? (true or false)
+        pageInfo: data,         // 가장 큰 저장소
+
+        // 2. 직원수정 기능 내보내기
+
+        updateEmployee,      // 수정실행 버튼.
+        updatePending,      // 내용 업데이트 중일 떄 추가 동작 막는용도
+
+        // 3. 페이징 관련 정보 (팀원 형식에 맞춤)
+
+        currentPage: currentPageUI,     // 현재 페이지 (1부터)
+        totalPages,                     // 전체 페이지 수
+        pageNumbers,                    // [1, 2, 3] 형태의 배열
+        totalCount,                     // 전체 인원수
+        startItemNumber,                // 시작 번호
+        endItemNumber,                  // 끝 번호
+
+        // 4. 이동 함수들
+        changePage: changePage,         // 페이지 이동 (클릭)
+        goToPrevPage: goToPrevPage,     // 이전페이지 이동
+        goToNextPage: goToNextPage      // 다음페이지   이동
+    } = employeeQuery();
 
     const [formData, setFormData] = useState({
-        employeeNumber : "",    // 사번 
-        name : "",              // 이름 
-        email : "",             // 이메일
-        password : "",          // 비밀번호
-        departmentId : "",      // 부서 Id
-        position : "",          // 직책
-        hireDate : "",          // 입사일
-        retireDate : "",        // 퇴사일
-        role : "",              // 시스템 역할
-        status : ""             // 상태
+        employeeId: "", // 직원 Id
+        employeeNumber: "",    // 직원사번 
+        name: "",              // 이름 
+        email: "",             // 이메일
+        password: "",          // 비밀번호
+        departmentId: "",      // 부서 Id
+        position: "",          // 직책
+        hireDate: "",          // 입사일
+        retireDate: "",        // 퇴사일
+        role: "",              // 시스템 역할
+        status: ""             // 상태
 
     });  // 입력으로 저장하게 될 것 : formData
 
-    const handleChange = () => {      // 입력칸과의 연동을 위한 함수 : handleChange()
-        const { name, value }= e.target // 입력란에서, name과 value만 가져오기
+    const handleChange = (e) => {      // 입력칸과의 연동을 위한 함수 : handleChange()
+        const { name, value } = e.target // 입력란에서, name과 value만 가져오기
         setFormData({
             ...formData,            // 입력 외에는 기본 값 유지...
-            [name] : value          // 입력이 들어온 태그에 대해서만 변경점 적용
+            [name]: value          // 입력이 들어온 태그에 대해서만 변경점 적용
         });
     };
 
-    const handleSubmit//  저장 확정시키기 : handleSubmit
-                     // -  formData를 확정시킴. setFormData로.  submit속성을 e.target에서 가져와야하지않을까?
+    // -  formData를 확정시킴. setFormData로. 
+    const handleSubmit = (e) => {    //  저장 확정시키기 : handleSubmit
+        if (e) e.preventDefault();
+        // 수정을 확정하면.. 수정 쿼리가 가야하지않을까?
+        updateEmployee({
+            id: formData.employeeId,
+            reqDto: formData
+        })       // handleChange가 관리하고 있던 현재값을 최종반영
+    }
 
+    // 에러 메세지 전달
+    const errorMessage = isError ? "수정 중 오류가 발생했습니다." : null;
 
     return (
+
         <>
             <Sidebar />
             <Header />
@@ -55,7 +95,11 @@ function EmployeeEdit() {
                             >
                                 취소
                             </button>
-                            <button className="btn-primary" type="button">
+                            <button className="btn-primary"
+                                type="button"
+                                onClick={handleSubmit}        // 저장기능 연결
+                                disabled={isLoading}          // 로딩중일 때 클릭 막기
+                            >
                                 수정 내용 저장
                             </button>
                         </div>
@@ -70,7 +114,7 @@ function EmployeeEdit() {
                                         기본 정보
                                     </h3>
                                 </div>
-
+                                {/* 사번  : 사번은 수정불가함 */}
                                 <div className="card-body">
                                     <div className="form-row">
                                         <div className="form-group">
@@ -80,28 +124,36 @@ function EmployeeEdit() {
                                                 disabled
                                                 type="text"
                                                 defaultValue="EMP-2024-001"
+                                                name="employeeId"
+                                                value={formData.employeeId}
                                             />
                                         </div>
-
+                                        {/* 이름 */}
                                         <div className="form-group">
                                             <label className="label-text">이름</label>
                                             <input
                                                 className="input-field"
                                                 type="text"
                                                 defaultValue="김서연"
+                                                name="name"
+                                                value={formData.name}
+                                                onChange={handleChange}
                                             />
                                         </div>
                                     </div>
-
+                                    {/* 이메일 */}
                                     <div className="form-group">
                                         <label className="label-text">이메일</label>
                                         <input
                                             className="input-field"
                                             type="email"
                                             defaultValue="seoyeon.kim@nexuspro.com"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
                                         />
                                     </div>
-
+                                    {/* 비번 */}
                                     <div className="form-group">
                                         <label className="label-text">비밀번호</label>
                                         <div className="password-container">
@@ -109,6 +161,9 @@ function EmployeeEdit() {
                                                 className="input-field"
                                                 type="password"
                                                 defaultValue="********"
+                                                name="password"
+                                                value={formData.password}
+                                                onChange={handleChange}
                                             />
                                             <button className="password-toggle" type="button">
                                                 <span
@@ -124,39 +179,52 @@ function EmployeeEdit() {
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label className="label-text">부서</label>
-                                            <select className="input-field" defaultValue="제품 기획팀">
+                                            <select className="input-field"
+                                                defaultValue="제품 기획팀"
+                                                name="">
                                                 <option>인사팀</option>
                                                 <option>제품 기획팀</option>
                                                 <option>개발 1본부</option>
                                                 <option>마케팅부</option>
                                             </select>
                                         </div>
-
+                                        {/* 직책 */}
                                         <div className="form-group">
                                             <label className="label-text">직책</label>
-                                            <select className="input-field" defaultValue="과장">
-                                                <option>사원</option>
-                                                <option>대리</option>
-                                                <option>과장</option>
-                                                <option>차장</option>
-                                                <option>부장</option>
+                                            <select className="input-field"
+                                                name="position"
+                                                value={formData.position}
+                                                onChange={handleChange}>
+                                                <option value="사원">사원</option>
+                                                <option value="대리">대리</option>
+                                                <option value="과장">과장</option>
+                                                <option value="차장">차장</option>
+                                                <option valeu="부장">부장</option>
                                             </select>
                                         </div>
                                     </div>
-
+                                    {/* 입사일 */}
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label className="label-text">입사일</label>
                                             <input
                                                 className="input-field"
                                                 type="date"
-                                                defaultValue="2024-01-15"
+                                                name="hireDate"
+                                                value={formData.hireDate}
+                                                onChange={handleChange}
                                             />
                                         </div>
-
+                                        {/* 퇴사일 */}
                                         <div className="form-group">
                                             <label className="label-text">퇴사일</label>
-                                            <input className="input-field" type="date" />
+                                            <input
+                                                className="input-field"
+                                                type="date"
+                                                name="retireDate"
+                                                value={formData.retireDate}
+                                                onChagne={handleChange}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -165,11 +233,12 @@ function EmployeeEdit() {
                             <section className="section-card">
                                 <div className="card-header">
                                     <h3 className="card-title">
-                                        <span className="material-symbols-outlined">security</span>
+                                        <span
+                                            className="material-symbols-outlined">security</span>
                                         권한 및 상태
                                     </h3>
                                 </div>
-
+                                {/* 시스템역할  */}
                                 <div className="card-body">
                                     <div className="form-group">
                                         <label className="label-text">시스템 역할</label>
@@ -184,13 +253,28 @@ function EmployeeEdit() {
                                         </p>
 
                                         <div className="roles-container">
-                                            <button className="role-btn" type="button">
+                                            <button
+                                                className="role-btn"
+                                                type="button"
+                                                name="role"
+                                                value={formData.role}
+                                                onChagne={handleChange}>
                                                 직원
                                             </button>
-                                            <button className="role-btn active" type="button">
+                                            <button
+                                                className="role-btn active"
+                                                type="button"
+                                                name="role"
+                                                value={formData.role}
+                                                onChagne={handleChange}>
                                                 매니저
                                             </button>
-                                            <button className="role-btn" type="button">
+                                            <button 
+                                                className="role-btn"
+                                                type="button"
+                                                name = "role"
+                                                value = {formData.role}
+                                                onChagne = {handleChange}>
                                                 관리자
                                             </button>
                                         </div>
@@ -205,10 +289,14 @@ function EmployeeEdit() {
                                                 비활성화 시 시스템 접근이 차단됩니다.
                                             </p>
                                         </div>
-
+                                        {/* 상태 입력란 */}
                                         <div style={{ display: "flex", alignItems: "center" }}>
                                             <label className="toggle-switch">
-                                                <input defaultChecked type="checkbox" />
+                                                <input 
+                                                    defaultChecked type="checkbox"
+                                                    name = "status"
+                                                    value = {formData.status}
+                                                    onChagne = {handleChange} />
                                                 <span className="slider"></span>
                                             </label>
                                             <span className="status-label">Active</span>

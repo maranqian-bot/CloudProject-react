@@ -14,3 +14,9 @@ export const postEmployeesApi = async(employeeData) => {
     const response = await axiostInstance.post("/api/employee/post" , employeeData);
     return response.data;   // 게시 경로와, 데이터 객체 보내주기
 }
+
+// 수정하기     :   sts4 컨트롤러에 맞추어서/       매개변수 : 아이디랑, 요청객체 
+export const putEmployeesApi = async(id, reqDto) => {
+    const response = await axiosInstance.put(`/api/employee/edit/${id}`, reqDto);
+    return response.data;
+}
