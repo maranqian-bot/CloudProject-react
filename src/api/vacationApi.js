@@ -29,6 +29,41 @@ const getMockEndDate = ({ startDate, selectedDays }) => {
     return `${year}-${month}-${day}`;
 };
 
+/**
+ * VacationManagement 페이지 전체 데이터 조회
+ * backend:
+ * GET /api/vacation-management
+ * params:
+ * - employeeNumber
+ * - approverEmployeeNumber
+ * - year
+ */
+export const getVacationManagementPage = async ({
+    employeeNumber,
+    approverEmployeeNumber,
+    year,
+}) => {
+    try {
+        const response = await axiosInstance.get("/api/vacation-management", {
+            params: {
+                employeeNumber,
+                approverEmployeeNumber,
+                year,
+            },
+        });
+
+        // ApiResponseDTO.success(..., data) 구조 기준
+        return response.data.data;
+    } catch (error) {
+        console.error("휴가 관리 페이지 조회 실패:", error);
+        throw error;
+    }
+};
+
+/**
+ * 아래 함수들은 기존 다른 페이지에서 아직 사용할 수 있으므로 우선 유지
+ * VacationManagement 페이지에서는 더 이상 사용하지 않음
+ */
 export const getVacationRequestList = async ({ page, limit, type }) => {
     try {
         const params = {
