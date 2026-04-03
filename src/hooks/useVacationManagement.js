@@ -1,114 +1,63 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     useApproveVacationRequestMutation,
-    useCurrentEmployeeQuery,
     useRejectVacationRequestMutation,
-    useVacationRequestListQuery,
+    useVacationManagementQuery,
 } from "../query/vacationQuery";
+import { getLoginUser } from "../utils/authStorage";
 
-const ALL_ITEMS_LIMIT = 999;
 const ITEMS_PER_PAGE = 5;
-
-const getDateTime = (dateString) => {
-    if (!dateString) return 0;
-
-    const time = new Date(dateString).getTime();
-    return Number.isNaN(time) ? 0 : time;
-};
-
-const isCurrentYearDate = (dateString) => {
-    if (!dateString) return false;
-
-    const targetDate = new Date(dateString);
-    if (Number.isNaN(targetDate.getTime())) return false;
-
-    const now = new Date();
-    return targetDate.getFullYear() === now.getFullYear();
-};
 
 export const useVacationManagement = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
-    const {
-        data: currentEmployee = null,
-        isLoading: isCurrentEmployeeLoading,
-        isError: isCurrentEmployeeError,
-        error: currentEmployeeError,
-    } = useCurrentEmployeeQuery();
+    const loginUser = getLoginUser();
+    const employeeNumber = loginUser?.employeeNumber ?? null;
+    const currentYear = new Date().getFullYear();
 
-    // 전체 데이터를 조회한 뒤, 내 신청 이력 영역은 프론트에서 페이지네이션 처리
     const {
-        data: requestListData = { items: [], totalCount: 0 },
-        isLoading: isRequestListLoading,
-        isError: isRequestListError,
-        error: requestListError,
-    } = useVacationRequestListQuery({
-        page: 1,
-        limit: ALL_ITEMS_LIMIT,
-        type: "ALL",
+        data: vacationManagementData = null,
+        isLoading,
+        isError,
+        error,
+    } = useVacationManagementQuery({
+        employeeNumber,
+        approverEmployeeNumber: employeeNumber,
+        year: currentYear,
     });
 
     const approveMutation = useApproveVacationRequestMutation();
     const rejectMutation = useRejectVacationRequestMutation();
 
     const viewModel = useMemo(() => {
-        const allRequests = requestListData.items ?? [];
+        const summary = vacationManagementData?.summary ?? {
+            availableVacationDays: 0,
+            usedVacationDays: 0,
+            pendingApprovalCount: 0,
+        };
 
-        const myHistory = currentEmployee
-            ? allRequests
-                .filter(
-                    (item) => item.employeeId === currentEmployee.employeeId
-                )
-                .sort(
-                    (a, b) =>
-                        getDateTime(b.startDate) - getDateTime(a.startDate)
-                )
-            : [];
+        const myVacationHistories =
+            vacationManagementData?.myVacationHistories ?? [];
 
-        const myPendingApprovals = currentEmployee
-            ? allRequests
-                .filter(
-                    (item) =>
-                        item.status === "PENDING" &&
-                        item.approverId === currentEmployee.employeeId
-                )
-                .sort(
-                    (a, b) =>
-                        getDateTime(b.startDate) - getDateTime(a.startDate)
-                )
-            : [];
+        const pendingApprovals =
+            vacationManagementData?.pendingApprovals ?? [];
 
-        const totalCount = myHistory.length;
-        const totalPages = Math.max(
-            1,
-            Math.ceil(totalCount / ITEMS_PER_PAGE)
-        );
-        const safeCurrentPage = Math.min(
-            Math.max(currentPage, 1),
-            totalPages
-        );
+        const totalCount = myVacationHistories.length;
+        const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+        const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
 
         const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-        const currentPageData = myHistory.slice(
+        const currentPageData = myVacationHistories.slice(
             startIndex,
             startIndex + ITEMS_PER_PAGE
         );
 
         const startItemNumber =
             totalCount === 0 ? 0 : (safeCurrentPage - 1) * ITEMS_PER_PAGE + 1;
-        const endItemNumber = Math.min(
-            safeCurrentPage * ITEMS_PER_PAGE,
-            totalCount
-        );
-
-        // 사용 휴가는 startDate 기준으로 연도 계산
-        const usedVacationDays = myHistory
-            .filter(
-                (item) =>
-                    item.status === "APPROVED" &&
-                    isCurrentYearDate(item.startDate)
-            )
-            .reduce((acc, item) => acc + Number(item.days || 0), 0);
+        const endItemNumber =
+            totalCount === 0
+                ? 0
+                : Math.min(safeCurrentPage * ITEMS_PER_PAGE, totalCount);
 
         return {
             currentPageData,
@@ -117,13 +66,13 @@ export const useVacationManagement = () => {
             safeCurrentPage,
             startItemNumber,
             endItemNumber,
-            availableVacationDays: currentEmployee?.availableVacationDays ?? 0,
-            usedVacationDays,
-            pendingApprovalCount: myPendingApprovals.length,
-            myPendingApprovals,
-            hasPendingApprovals: myPendingApprovals.length > 0,
+            availableVacationDays: summary.availableVacationDays ?? 0,
+            usedVacationDays: summary.usedVacationDays ?? 0,
+            pendingApprovalCount: summary.pendingApprovalCount ?? 0,
+            myPendingApprovals: pendingApprovals,
+            hasPendingApprovals: pendingApprovals.length > 0,
         };
-    }, [requestListData.items, currentEmployee, currentPage, ITEMS_PER_PAGE]);
+    }, [vacationManagementData, currentPage]);
 
     useEffect(() => {
         if (currentPage !== viewModel.safeCurrentPage) {
@@ -146,7 +95,6 @@ export const useVacationManagement = () => {
 
     const handleApprove = (requestId) => {
         if (approveMutation.isPending) return;
-
         approveMutation.mutate({ requestId });
     };
 
@@ -161,7 +109,7 @@ export const useVacationManagement = () => {
     };
 
     return {
-        currentEmployee,
+        currentEmployee: loginUser,
         currentPageData: viewModel.currentPageData,
         myHistoryTotalCount: viewModel.myHistoryTotalCount,
         currentPage: viewModel.safeCurrentPage,
@@ -173,9 +121,9 @@ export const useVacationManagement = () => {
         pendingApprovalCount: viewModel.pendingApprovalCount,
         myPendingApprovals: viewModel.myPendingApprovals,
         hasPendingApprovals: viewModel.hasPendingApprovals,
-        isLoading: isCurrentEmployeeLoading || isRequestListLoading,
-        isError: isCurrentEmployeeError || isRequestListError,
-        error: currentEmployeeError || requestListError,
+        isLoading,
+        isError: !employeeNumber || isError,
+        error: !employeeNumber ? new Error("로그인 사용자 정보가 없습니다.") : error,
         handleApprove,
         handleReject,
         goToPage,
