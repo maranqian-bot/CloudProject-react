@@ -14,8 +14,7 @@ export const useCreateDepartmentMutation = () => {
 };
 
 // 부서 목록 조회 Query
-export const useDepartmentQuery = (page, size, sort) => {
-  console.log("지금 들어온 page 값은?:", page, "타입은?:", typeof page);
+export const useDepartmentQuery = (page, size) => {
 
   return useQuery({
     queryKey:["departments", page, size],

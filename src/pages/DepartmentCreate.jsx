@@ -25,7 +25,6 @@ function DepartmentCreate() {
                     </p>
 
                     <div className="content-grid">
-                        <div className="content-grid">
                             <div className="form-section">
                                 <DepartmentForm isEditMode={false} />
                             </div>
@@ -70,7 +69,6 @@ function DepartmentCreate() {
                             <p>© 2026 Nexus Pro HR Systems. All architectural standards applied.</p>
                         </footer>
                     </div>
-                </div>
             </main>
 
         </>

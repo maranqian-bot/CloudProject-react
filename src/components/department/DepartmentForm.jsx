@@ -34,7 +34,7 @@ const DepartmentForm = ({ departmentId, isEditMode, initialData }) => {
           <input
             name="deptCode"
             className="input-field"
-            defaultValue={initialData.deptCode}
+            defaultValue={initialData?.deptCode}
             placeholder="예: DEPT-001"
             required
           />
@@ -46,7 +46,7 @@ const DepartmentForm = ({ departmentId, isEditMode, initialData }) => {
           <input
             name="deptName"
             className="input-field"
-            defaultValue={initialData.deptName}
+            defaultValue={initialData?.deptName}
             placeholder="부서 이름을 입력하세요"
             required
           />
@@ -59,7 +59,7 @@ const DepartmentForm = ({ departmentId, isEditMode, initialData }) => {
         <textarea
           name="description"
           className="input-field"
-          defaultValue={initialData.description}
+          defaultValue={initialData?.description}
           placeholder="업무 범위를 입력하세요..."
           rows={4}
         />
