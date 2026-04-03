@@ -4,6 +4,7 @@ import {
     getAvatarText,
     formatDateRange,
     formatVacationDays,
+    getVacationTypeLabel,
 } from "../../utils/vacationRequestUtils";
 
 function VacationRequestListTableRow({
@@ -39,7 +40,7 @@ function VacationRequestListTableRow({
             </td>
 
             <td>
-                <span className="type-text">{item.vacationType}</span>
+                <span className="type-text">{getVacationTypeLabel(item.vacationType)}</span>
             </td>
 
             <td>

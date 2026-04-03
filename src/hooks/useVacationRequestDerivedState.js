@@ -8,8 +8,6 @@ const formatVacationDays = (days) => {
 
 const toSafeNumber = (value) => {
     const parsedValue = Number(value);
-
-    // 잘못된 숫자 값 방어 처리
     return Number.isNaN(parsedValue) ? 0 : parsedValue;
 };
 
@@ -35,7 +33,7 @@ export const useVacationRequestDerivedState = ({
         expectedRemainingVacationDays
     )}일이 남게 됩니다.`;
 
-    const showOtherReason = formData.vacationType === "기타";
+    const showOtherReason = formData.vacationType === "ETC";
 
     return {
         selectedDays,

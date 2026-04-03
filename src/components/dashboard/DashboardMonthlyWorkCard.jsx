@@ -1,42 +1,38 @@
-import { DASHBOARD_SEGMENT_COUNT } from "../../utils/dashboardUtils";
-
 function DashboardMonthlyWorkCard({
     workedDays,
     targetWorkDays,
     filledSegmentCount,
 }) {
+    const segments = Array.from({ length: 4 }, (_, index) => ({
+        id: index,
+        filled: index < filledSegmentCount,
+    }));
+
     return (
-        <div className="card stat-card">
-            <div className="stat-header">
-                <div className="stat-icon icon-orange">
-                    <span className="material-symbols-outlined">
-                        work_history
-                    </span>
-                </div>
-
-                <div>
-                    <p className="stat-title">이번 달 근무</p>
-                    <p className="stat-desc">출근 기록 일수</p>
-                </div>
+        <div className="card monthly-work-card">
+            <div className="card-label-row">
+                <span className="card-label">이번 달 근무 현황</span>
             </div>
 
-            <div className="stat-value-box">
-                <span className="stat-value">{workedDays}</span>
-                <span className="stat-unit">/ {targetWorkDays} 일</span>
+            <div className="work-summary-row">
+                <p className="work-summary-value">
+                    {workedDays}
+                    <span className="work-summary-unit">일</span>
+                </p>
+                <p className="work-summary-target">
+                    / {targetWorkDays}일
+                </p>
             </div>
 
-            <div className="segments">
-                {Array.from({ length: DASHBOARD_SEGMENT_COUNT }).map(
-                    (_, index) => (
-                        <div
-                            key={index}
-                            // segment 개수는 공통 상수를 사용
-                            className={`segment ${
-                                index < filledSegmentCount ? "fill" : ""
-                            }`}
-                        />
-                    )
-                )}
+            <div className="work-progress-segments">
+                {segments.map((segment) => (
+                    <div
+                        key={segment.id}
+                        className={`progress-segment ${
+                            segment.filled ? "filled" : ""
+                        }`}
+                    />
+                ))}
             </div>
         </div>
     );

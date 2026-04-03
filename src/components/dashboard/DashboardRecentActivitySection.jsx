@@ -1,9 +1,5 @@
-const getTagClassName = (attendanceStatus) => {
-    if (attendanceStatus === "OVERTIME") {
-        return "tag tag-extra";
-    }
-
-    return "tag tag-normal";
+const getTagClassName = (statusClass) => {
+    return statusClass ?? "tag tag-normal";
 };
 
 function DashboardRecentActivitySection({
@@ -85,17 +81,17 @@ function DashboardRecentActivitySection({
                         ) : (
                             activities.map((item) => (
                                 <tr key={item.id}>
-                                    <td>{item.workDate}</td>
-                                    <td>{item.checkInTime}</td>
-                                    <td>{item.checkOutTime}</td>
-                                    <td>{item.workDuration}</td>
+                                    <td>{item.workDateText}</td>
+                                    <td>{item.checkInTimeText}</td>
+                                    <td>{item.checkOutTimeText}</td>
+                                    <td>{item.workMinutesText}</td>
                                     <td className="align-right">
                                         <span
                                             className={getTagClassName(
-                                                item.attendanceStatus
+                                                item.statusClass
                                             )}
                                         >
-                                            {item.attendanceStatusLabel}
+                                            {item.statusLabel}
                                         </span>
                                     </td>
                                 </tr>

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const INITIAL_FORM_DATA = {
     proxyEmployeeNumber: "",
-    vacationType: "기타",
+    vacationType: "",
     reasonDetail: "",
     startDate: "",
     days: 1,
@@ -10,8 +10,6 @@ const INITIAL_FORM_DATA = {
 
 const parseNumberValue = (value) => {
     const parsedValue = Number(value);
-
-    // 숫자 변환 실패 시 안전하게 0으로 처리
     return Number.isNaN(parsedValue) ? 0 : parsedValue;
 };
 
@@ -21,7 +19,6 @@ export const useVacationRequestForm = () => {
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-
         const nextValue = name === "days" ? parseNumberValue(value) : value;
 
         setFormData((prev) => ({
@@ -41,7 +38,7 @@ export const useVacationRequestForm = () => {
         setFormData((prev) => ({
             ...prev,
             vacationType: value,
-            reasonDetail: value === "기타" ? prev.reasonDetail : "",
+            reasonDetail: value === "ETC" ? prev.reasonDetail : "",
         }));
 
         setErrors((prev) => ({
@@ -70,7 +67,7 @@ export const useVacationRequestForm = () => {
             nextErrors.days = "잔여 연차를 초과하여 신청할 수 없습니다.";
         }
 
-        if (formData.vacationType === "기타" && !formData.reasonDetail.trim()) {
+        if (formData.vacationType === "ETC" && !formData.reasonDetail.trim()) {
             nextErrors.reasonDetail = "기타 사유를 입력해 주세요.";
         }
 

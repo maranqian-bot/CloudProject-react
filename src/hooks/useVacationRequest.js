@@ -6,16 +6,23 @@ import {
 import { useVacationRequestDerivedState } from "./useVacationRequestDerivedState";
 import { useVacationRequestForm } from "./useVacationRequestForm";
 import { useVacationRequestSubmit } from "./useVacationRequestSubmit";
+import { getLoginUser } from "../utils/authStorage";
 
 export const useVacationRequest = () => {
     const navigate = useNavigate();
+    const loginUser = getLoginUser();
+    const employeeNumber = loginUser?.employeeNumber ?? null;
+    const currentYear = new Date().getFullYear();
 
     const {
         data: currentEmployee = null,
         isLoading: isCurrentEmployeeLoading,
         isError: isCurrentEmployeeError,
         error: currentEmployeeError,
-    } = useCurrentEmployeeQuery();
+    } = useCurrentEmployeeQuery({
+        employeeNumber,
+        year: currentYear,
+    });
 
     const createVacationRequestMutation = useCreateVacationRequestMutation();
 
@@ -55,8 +62,10 @@ export const useVacationRequest = () => {
         errors,
         currentEmployee,
         isCurrentEmployeeLoading,
-        isCurrentEmployeeError,
-        currentEmployeeError,
+        isCurrentEmployeeError: !employeeNumber || isCurrentEmployeeError,
+        currentEmployeeError: !employeeNumber
+            ? new Error("로그인 사용자 정보가 없습니다.")
+            : currentEmployeeError,
         showOtherReason,
         availableVacationText,
         requestAfterApprovalText,
