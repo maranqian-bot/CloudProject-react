@@ -2,7 +2,7 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/dashboard.css?inline";
-import employeeQuery from "../query/EmployeeQuery.js";
+import employeeQuery from "../query/employeeQuery.js";
 import { useNavigate } from "react-router-dom";
 
 function EmployeeManagement() {
@@ -29,7 +29,8 @@ function EmployeeManagement() {
     const renderTableBody = () => {
         if (loading) return <tr><td colSpan="6" style={{ textAlign: "center", padding: "40px" }}>데이터 로딩 중...</td></tr>;
         if (isError) return <tr><td colSpan="6" style={{ textAlign: "center", color: "red", padding: "40px" }}>{errorMessage}</td></tr>;
-
+        
+        //   emp -> 직원 한명
         return employee.map((emp) => (
             <tr key={emp.id}>
                 {/* 사번: #00000 스타일 */}
