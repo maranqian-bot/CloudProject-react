@@ -1,25 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    checkInAttendance,
-    checkOutAttendance,
-    getDashboardData,
+    checkIn,
+    checkOut,
+    getDashboardSummary,
 } from "../api/dashboardApi";
 
 export const DASHBOARD_QUERY_KEYS = {
     DASHBOARD_BASE: ["dashboard"],
-    DASHBOARD: ({ employeeNumber, year, month }) => [
-        ...DASHBOARD_QUERY_KEYS.DASHBOARD_BASE,
-        employeeNumber,
-        year,
-        month,
-    ],
+    DASHBOARD: ["dashboard", "summary"],
 };
 
-export const useDashboardQuery = ({ employeeNumber, year, month, enabled = true }) => {
+export const useDashboardQuery = ({ enabled = true }) => {
     return useQuery({
-        queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD({ employeeNumber, year, month }),
-        queryFn: () => getDashboardData({ employeeNumber, year, month }),
-        enabled: enabled && Boolean(employeeNumber) && Boolean(year) && Boolean(month),
+        queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD,
+        queryFn: getDashboardSummary,
+        enabled,
     });
 };
 
@@ -37,9 +32,9 @@ const useDashboardMutation = (mutationFn) => {
 };
 
 export const useCheckInAttendanceMutation = () => {
-    return useDashboardMutation(checkInAttendance);
+    return useDashboardMutation(checkIn);
 };
 
 export const useCheckOutAttendanceMutation = () => {
-    return useDashboardMutation(checkOutAttendance);
+    return useDashboardMutation(checkOut);
 };
