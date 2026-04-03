@@ -1,9 +1,9 @@
 export const TYPE_TABS = [
     { label: "전체 목록", value: "ALL" },
-    { label: "교육", value: "교육" },
-    { label: "병가", value: "병가" },
-    { label: "경조사", value: "경조사" },
-    { label: "기타", value: "기타" },
+    { label: "연차", value: "ANNUAL" },
+    { label: "병가", value: "SICK" },
+    { label: "경조사", value: "EVENT" },
+    { label: "기타", value: "ETC" },
 ];
 
 export const STATUS = {
@@ -19,6 +19,17 @@ export const STATUS = {
         label: "반려",
         className: "badge badge-rejected",
     },
+};
+
+export const VACATION_TYPE_LABELS = {
+    ANNUAL: "연차",
+    SICK: "병가",
+    EVENT: "경조사",
+    ETC: "기타",
+};
+
+export const getVacationTypeLabel = (type) => {
+    return VACATION_TYPE_LABELS[type] ?? type;
 };
 
 export const getStatusClass = (status) => {

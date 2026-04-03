@@ -4,6 +4,7 @@ import {
     formatVacationDays,
     getStatusClass,
     getVacationStatusLabel,
+    getVacationTypeLabel,
 } from "../../utils/vacationRequestUtils";
 
 function VacationManagementHistorySection({
@@ -67,21 +68,23 @@ function VacationManagementHistorySection({
                         </tr>
                     ) : (
                         currentPageData.map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.vacationType}</td>
+                            <tr key={item.vacationId}>
+                                <td>{getVacationTypeLabel(item.vacationType)}</td>
                                 <td>
                                     {formatDateRange(
                                         item.startDate,
                                         item.endDate
                                     )}
                                 </td>
-                                <td>{formatVacationDays(item.days)}일</td>
+                                <td>{formatVacationDays(item.vacationDays)}</td>
                                 <td style={{ textAlign: "right" }}>
                                     <span
-                                        className={`status-badge ${getStatusClass(item.status)}`}
+                                        className={`status-badge ${getStatusClass(
+                                            item.vacationStatus
+                                        )}`}
                                     >
                                         {getVacationStatusLabel(
-                                            item.status,
+                                            item.vacationStatus,
                                             "history"
                                         )}
                                     </span>

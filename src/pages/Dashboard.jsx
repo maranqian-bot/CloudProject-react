@@ -33,9 +33,7 @@ function Dashboard() {
                             currentTime={dashboard.currentTime}
                             meridiem={dashboard.meridiem}
                             currentDateLabel={dashboard.currentDateLabel}
-                            attendanceStatusLabel={
-                                dashboard.attendanceStatusLabel
-                            }
+                            attendanceStatusLabel={dashboard.attendanceStatusLabel}
                             isCheckInDisabled={dashboard.isCheckInDisabled}
                             isCheckOutDisabled={dashboard.isCheckOutDisabled}
                             onCheckIn={dashboard.handleCheckIn}
@@ -46,20 +44,14 @@ function Dashboard() {
 
                         <div className="stats-col">
                             <DashboardVacationCard
-                                remainingVacationDays={
-                                    dashboard.remainingVacationDays
-                                }
-                                progressPercent={
-                                    dashboard.vacationProgressPercent
-                                }
+                                remainingVacationDays={dashboard.remainingVacationDays}
+                                progressPercent={dashboard.vacationProgressPercent}
                             />
 
                             <DashboardMonthlyWorkCard
                                 workedDays={dashboard.workedDays}
                                 targetWorkDays={dashboard.targetWorkDays}
-                                filledSegmentCount={
-                                    dashboard.filledSegmentCount
-                                }
+                                filledSegmentCount={dashboard.filledSegmentCount}
                             />
                         </div>
 

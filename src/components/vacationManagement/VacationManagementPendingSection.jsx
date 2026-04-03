@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {
     formatDateRange,
     formatVacationDays,
+    getVacationTypeLabel,
 } from "../../utils/vacationRequestUtils";
 
 function VacationManagementPendingSection({
@@ -42,7 +43,7 @@ function VacationManagementPendingSection({
                     </div>
                 ) : (
                     myPendingApprovals.map((item) => (
-                        <div key={item.id} className="stat-card">
+                        <div key={item.vacationId} className="stat-card">
                             <div style={{ marginBottom: "16px" }}>
                                 <p style={{ fontWeight: 700 }}>
                                     {item.employeeName}
@@ -54,7 +55,10 @@ function VacationManagementPendingSection({
                                         marginTop: "4px",
                                     }}
                                 >
-                                    {item.position} · {item.departmentName}
+                                    {item.position}
+                                    {item.departmentName
+                                        ? ` · ${item.departmentName}`
+                                        : ""}
                                 </p>
                             </div>
 
@@ -66,7 +70,8 @@ function VacationManagementPendingSection({
                                 }}
                             >
                                 <div>
-                                    <strong>종류</strong> {item.vacationType}
+                                    <strong>종류</strong>{" "}
+                                    {getVacationTypeLabel(item.vacationType)}
                                 </div>
                                 <div>
                                     <strong>기간</strong>{" "}
@@ -77,7 +82,7 @@ function VacationManagementPendingSection({
                                 </div>
                                 <div>
                                     <strong>일수</strong>{" "}
-                                    {formatVacationDays(item.days)}일
+                                    {formatVacationDays(item.vacationDays)}
                                 </div>
                             </div>
 
@@ -85,7 +90,9 @@ function VacationManagementPendingSection({
                                 <button
                                     className="btn"
                                     type="button"
-                                    onClick={() => handleRejectClick(item.id)}
+                                    onClick={() =>
+                                        handleRejectClick(item.vacationId)
+                                    }
                                     disabled={isActionPending}
                                 >
                                     반려
@@ -94,7 +101,7 @@ function VacationManagementPendingSection({
                                 <button
                                     className="btn btn-primary"
                                     type="button"
-                                    onClick={() => onApprove(item.id)}
+                                    onClick={() => onApprove(item.vacationId)}
                                     disabled={isActionPending}
                                 >
                                     승인

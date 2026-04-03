@@ -5,15 +5,25 @@ import {
     useVacationRequestListQuery,
     useVacationRequestSummaryQuery,
 } from "../query/vacationQuery";
+import { getLoginUser } from "../utils/authStorage";
 
 export const useVacationRequestList = () => {
     const [activeType, setActiveType] = useState("ALL");
     const [currentPage, setCurrentPage] = useState(1);
 
+    const loginUser = getLoginUser();
+    const hasLoginUser = Boolean(loginUser?.employeeNumber);
+
     const itemsPerPage = 5;
 
     const {
-        data: listData = { items: [], totalCount: 0 },
+        data: listData = {
+            items: [],
+            totalCount: 0,
+            totalPages: 1,
+            currentPage: 1,
+            pageSize: itemsPerPage,
+        },
         isLoading: isListLoading,
         isError: isListError,
         error: listError,
@@ -21,6 +31,7 @@ export const useVacationRequestList = () => {
         page: currentPage,
         limit: itemsPerPage,
         type: activeType,
+        enabled: hasLoginUser,
     });
 
     const {
@@ -33,7 +44,9 @@ export const useVacationRequestList = () => {
         isLoading: isSummaryLoading,
         isError: isSummaryError,
         error: summaryError,
-    } = useVacationRequestSummaryQuery();
+    } = useVacationRequestSummaryQuery({
+        enabled: hasLoginUser,
+    });
 
     const approveMutation = useApproveVacationRequestMutation();
     const rejectMutation = useRejectVacationRequestMutation();
@@ -41,11 +54,15 @@ export const useVacationRequestList = () => {
     const viewModel = useMemo(() => {
         const currentPageData = listData.items ?? [];
         const totalCount = listData.totalCount ?? 0;
-        const totalPages = Math.max(1, Math.ceil(totalCount / itemsPerPage));
-        const safeCurrentPage = Math.min(currentPage, totalPages);
+        const totalPages = Math.max(1, listData.totalPages ?? 1);
+        const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
 
-        const startItemNumber = totalCount === 0 ? 0 : (safeCurrentPage - 1) * itemsPerPage + 1;
-        const endItemNumber = Math.min(safeCurrentPage * itemsPerPage, totalCount);
+        const startItemNumber =
+            totalCount === 0 ? 0 : (safeCurrentPage - 1) * itemsPerPage + 1;
+        const endItemNumber =
+            totalCount === 0
+                ? 0
+                : Math.min(safeCurrentPage * itemsPerPage, totalCount);
 
         return {
             filteredList: currentPageData,
@@ -55,10 +72,10 @@ export const useVacationRequestList = () => {
             safeCurrentPage,
             startItemNumber,
             endItemNumber,
-            pendingCount: summaryData.pendingCount,
-            approvedCount: summaryData.approvedCount,
-            rejectedCount: summaryData.rejectedCount,
-            monthlyVacationCount: summaryData.monthlyVacationCount,
+            pendingCount: summaryData.pendingCount ?? 0,
+            approvedCount: summaryData.approvedCount ?? 0,
+            rejectedCount: summaryData.rejectedCount ?? 0,
+            monthlyVacationCount: summaryData.monthlyVacationCount ?? 0,
         };
     }, [listData, summaryData, currentPage]);
 
@@ -74,7 +91,7 @@ export const useVacationRequestList = () => {
     };
 
     const goToPage = (page) => {
-        setCurrentPage(page);
+        setCurrentPage(Math.min(Math.max(page, 1), viewModel.totalPages));
     };
 
     const goToPrevPage = () => {
@@ -86,13 +103,17 @@ export const useVacationRequestList = () => {
     };
 
     const handleApprove = (requestId) => {
+        if (approveMutation.isPending) return;
         approveMutation.mutate({ requestId });
     };
 
     const handleReject = (requestId, rejectReason) => {
+        if (rejectMutation.isPending) return;
+        if (!rejectReason || !rejectReason.trim()) return;
+
         rejectMutation.mutate({
             requestId,
-            rejectReason,
+            rejectReason: rejectReason.trim(),
         });
     };
 
@@ -111,8 +132,10 @@ export const useVacationRequestList = () => {
         rejectedCount: viewModel.rejectedCount,
         monthlyVacationCount: viewModel.monthlyVacationCount,
         isLoading: isListLoading || isSummaryLoading,
-        isError: isListError || isSummaryError,
-        error: listError || summaryError,
+        isError: !hasLoginUser || isListError || isSummaryError,
+        error: !hasLoginUser
+            ? new Error("로그인 사용자 정보가 없습니다.")
+            : listError || summaryError,
         handleApprove,
         handleReject,
         goToPage,
