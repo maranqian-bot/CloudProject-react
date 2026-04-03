@@ -41,19 +41,28 @@ function VacationManagementHistorySection({
                 <tbody>
                     {isLoading ? (
                         <tr>
-                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
+                            <td
+                                colSpan="4"
+                                style={{ textAlign: "center", padding: "40px" }}
+                            >
                                 데이터를 불러오는 중입니다...
                             </td>
                         </tr>
                     ) : isError ? (
                         <tr>
-                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
+                            <td
+                                colSpan="4"
+                                style={{ textAlign: "center", padding: "40px" }}
+                            >
                                 데이터를 불러오지 못했습니다.
                             </td>
                         </tr>
                     ) : currentPageData.length === 0 ? (
                         <tr>
-                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
+                            <td
+                                colSpan="4"
+                                style={{ textAlign: "center", padding: "40px" }}
+                            >
                                 휴가 이력이 없습니다.
                             </td>
                         </tr>
@@ -61,7 +70,12 @@ function VacationManagementHistorySection({
                         currentPageData.map((item) => (
                             <tr key={item.vacationId}>
                                 <td>{getVacationTypeLabel(item.vacationType)}</td>
-                                <td>{formatDateRange(item.startDate, item.endDate)}</td>
+                                <td>
+                                    {formatDateRange(
+                                        item.startDate,
+                                        item.endDate
+                                    )}
+                                </td>
                                 <td>{formatVacationDays(item.vacationDays)}</td>
                                 <td style={{ textAlign: "right" }}>
                                     <span
@@ -69,7 +83,10 @@ function VacationManagementHistorySection({
                                             item.vacationStatus
                                         )}`}
                                     >
-                                        {getVacationStatusLabel(item.vacationStatus, "history")}
+                                        {getVacationStatusLabel(
+                                            item.vacationStatus,
+                                            "history"
+                                        )}
                                     </span>
                                 </td>
                             </tr>
