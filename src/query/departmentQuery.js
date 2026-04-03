@@ -36,11 +36,19 @@ export const useDepartmentDetailQuery = (departmentId) => {
 export const useUpdateDepartmentMutation = () => { 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ departmentId, requestDto }) => updateDepartmentApi(departmentId, requestDto ), 
-    onSuccess: ( data , variables) => {
+    mutationFn: ({ departmentId, data }) => updateDepartmentApi(departmentId, data ), 
+    onSuccess: ( responseData , variables) => {
+      // 전체 목록 새로고침
       queryClient.invalidateQueries(["departments"]);
+
+      // 특정 부서 상세 데이터 새로고침
       queryClient.invalidateQueries(["department", variables.departmentId]); //캐시 갱신
     },
+    onError: (error) => {
+      const mag = error.response?.data || "수정 중 오류가 발생했습니다.";
+      alert(msg);
+    },
+    
   });
 };
 

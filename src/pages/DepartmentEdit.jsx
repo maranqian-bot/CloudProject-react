@@ -2,8 +2,30 @@ import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/department-edit.css?inline";
+import { useNavigate, useParams } from "react-router-dom";
+import DepartmentFormEdit from "../components/department/DepartmentFormEdit.jsx";
+import { useDepartmentDetail } from "../hooks/useDepartmentDetail";
 
 function DepartmentEdit() {
+
+    const { departmentId } = useParams();
+    console.log("현재 ID 확인:", departmentId);
+    
+    const navigate = useNavigate();
+
+    const { department, isLoading, isError, onDelete } = useDepartmentDetail(departmentId);
+
+    const handleDelete = () => {
+        if (window.confirm("정말 이 부서를 삭제하시겠습니까? 관련 데이터가 모두 삭제됩니다.")) {
+            onDelete(); // 삭제 기능 
+            navigate("/department-management");
+        }
+    };
+
+    if (isLoading) return <div className="loading-state">데이터를 불러오는 중입니다...</div>;
+    if (isError) return <div className="error-state">데이터를 불러오는 데 실패했습니다.</div>;
+
+
     return (
         <>
             <Sidebar />
@@ -11,50 +33,20 @@ function DepartmentEdit() {
             <main>
                 <header className="content-header">
                     <div className="breadcrumb">부서 관리 &gt; 상세 정보</div>
-                    <h2 className="page-title">기술 전략 본부</h2>
+                    <h2 className="page-title">{department?.deptName || "부서 정보"}</h2>
                 </header>
-                {/* Department Basic Info */}
+                {/* 기본 정보 섹션 */}
                 <section className="card">
-                    <h3 className="section-title">기본 정보</h3>
-                    <div className="form-grid">
-                        <div className="form-group">
-                            <label>부서 코드</label>
-                            <input
-                                readOnly=""
-                                style={{
-                                    backgroundColor: "#f3f4f5",
-                                    borderColor: "transparent",
-                                    fontWeight: 600
-                                }}
-                                type="text"
-                                defaultValue="DEPT-TECH-001"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>부서 이름</label>
-                            <input type="text" defaultValue="기술 전략 본부" />
-                        </div>
-                        <div className="form-group">
-                            <label>부서장 사번</label>
-                            <input type="text" defaultValue="EMP-2024-001" />
-                        </div>
-                        <div className="form-group">
-                            <label>부서장 이름</label>
-                            <input type="text" defaultValue="김철수" />
-                        </div>
-                        <div className="form-group full-width">
-                            <label>부서 설명</label>
-                            <textarea
-                                rows={4}
-                                defaultValue={
-                                    "전사 기술 로드맵 수립 및 핵심 아키텍처 설계를 담당하며, 부서 간 기술 협력을 조율하는 전략 조직입니다."
-                                }
-                            />
-                        </div>
-                    </div>
+                    <h3 className="section-title">기본 정보 수정</h3>
+                    {/* DepartmentFormEdit 컴포넌트 호출*/}
+                    <DepartmentFormEdit
+                        departmentId={departmentId}
+                        isEditMode={true}
+                        initialData={department}
+                    />
                 </section>
-                {/* Department Members List */}
-                <section className="card">
+                {/* 부서원 목록 섹션 */}
+                <section className="card" style={{ marginTop: "24px" }}>
                     <h3 className="section-title">부서원 목록</h3>
                     <div className="table-container">
                         <table>
@@ -150,46 +142,16 @@ function DepartmentEdit() {
                         </div>
                     </div>
                 </section>
-                {/* Functional Buttons */}
-                <footer className="actions-footer">
-                    <button className="btn btn-danger">
-                        <span
-                            className="material-symbols-outlined"
-                            style={{ fontSize: "1.25rem" }}
-                        >
-                            delete
-                        </span>
+                {/* 하단 삭제 버튼 영역 */}
+                <footer className="actions-footer" style={{ marginTop: "24px", display: "flex", justifyContent: "flex-start" }}>
+                    <button className="btn btn-danger" onClick={handleDelete}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "1.25rem" }}>delete</span>
                         부서 삭제
                     </button>
-                    <div className="button-group">
-                        {/* <button
-                className="btn btn-secondary"
-                onclick="location.href='./department-management.html'"
-                >
-                취소
-                </button> */}
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                                window.location.href = "/department-management";
-                            }}
-                        >
-                            취소
-                        </button>
-                        <button className="btn btn-primary">
-                            <span
-                                className="material-symbols-outlined"
-                                style={{ fontSize: "1.25rem" }}
-                            >
-                                save
-                            </span>
-                            저장하기
-                        </button>
-                    </div>
                 </footer>
             </main>
         </>
-    )
+    );
 }
 
 export default withPageStyle(DepartmentEdit, "department-edit.css", pageCss);

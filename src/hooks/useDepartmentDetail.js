@@ -21,6 +21,7 @@ export const useDepartmentDetail = (departmentId) => {
   };
 
   return {
+    department: detail,
     formData,
     errors,
     isLoading,
