@@ -1,46 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    checkIn,
-    checkOut,
-    getDashboardSummary,
-    getRecentActivities,
-    getTodayAttendance,
+    checkInAttendance,
+    checkOutAttendance,
+    getDashboardData,
 } from "../api/dashboardApi";
 
 export const DASHBOARD_QUERY_KEYS = {
-    DASHBOARD_SUMMARY: ["dashboardSummary"],
-    TODAY_ATTENDANCE_BASE: ["todayAttendance"],
-    TODAY_ATTENDANCE: ({ workDate }) => [
-        ...DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE_BASE,
-        workDate,
-    ],
-    RECENT_ACTIVITIES_BASE: ["dashboardRecentActivities"],
-    RECENT_ACTIVITIES: ({ page, limit }) => [
-        ...DASHBOARD_QUERY_KEYS.RECENT_ACTIVITIES_BASE,
-        page,
-        limit,
+    DASHBOARD_BASE: ["dashboard"],
+    DASHBOARD: ({ employeeNumber, year, month }) => [
+        ...DASHBOARD_QUERY_KEYS.DASHBOARD_BASE,
+        employeeNumber,
+        year,
+        month,
     ],
 };
 
-export const useDashboardSummaryQuery = () => {
+export const useDashboardQuery = ({ employeeNumber, year, month, enabled = true }) => {
     return useQuery({
-        queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD_SUMMARY,
-        queryFn: getDashboardSummary,
-    });
-};
-
-export const useTodayAttendanceQuery = ({ workDate }) => {
-    return useQuery({
-        queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE({ workDate }),
-        queryFn: () => getTodayAttendance({ workDate }),
-        enabled: Boolean(workDate),
-    });
-};
-
-export const useRecentActivitiesQuery = ({ page, limit }) => {
-    return useQuery({
-        queryKey: DASHBOARD_QUERY_KEYS.RECENT_ACTIVITIES({ page, limit }),
-        queryFn: () => getRecentActivities({ page, limit }),
+        queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD({ employeeNumber, year, month }),
+        queryFn: () => getDashboardData({ employeeNumber, year, month }),
+        enabled: enabled && Boolean(employeeNumber) && Boolean(year) && Boolean(month),
     });
 };
 
@@ -51,24 +30,16 @@ const useDashboardMutation = (mutationFn) => {
         mutationFn,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD_SUMMARY,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: DASHBOARD_QUERY_KEYS.TODAY_ATTENDANCE_BASE,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: DASHBOARD_QUERY_KEYS.RECENT_ACTIVITIES_BASE,
+                queryKey: DASHBOARD_QUERY_KEYS.DASHBOARD_BASE,
             });
         },
     });
 };
 
-export const useCheckInMutation = () => {
-    return useDashboardMutation(checkIn);
+export const useCheckInAttendanceMutation = () => {
+    return useDashboardMutation(checkInAttendance);
 };
 
-export const useCheckOutMutation = () => {
-    return useDashboardMutation(checkOut);
+export const useCheckOutAttendanceMutation = () => {
+    return useDashboardMutation(checkOutAttendance);
 };

@@ -1,68 +1,137 @@
-import { useState } from "react";
-import { DASHBOARD_ITEMS_PER_PAGE } from "../utils/dashboardUtils";
-import { useAttendance } from "./useAttendance";
-import { useClock } from "./useClock";
-import { useDashboardData } from "./useDashboardData";
-import { useDashboardPagination } from "./useDashboardPagination";
+import { useMemo } from "react";
+import {
+    useCheckInAttendanceMutation,
+    useCheckOutAttendanceMutation,
+    useDashboardQuery,
+} from "../query/dashboardQuery";
+import {
+    buildDashboardSegments,
+    DEFAULT_TARGET_WORK_DAYS,
+    formatDate,
+    formatTime,
+    formatWorkMinutesToHourMinute,
+    getAttendanceActionState,
+    getAttendanceStatusClass,
+    getAttendanceStatusLabel,
+} from "../utils/dashboardUtils";
+import { getLoginUser } from "../utils/authStorage";
 
 export const useDashboard = () => {
-    const [currentPage, setCurrentPage] = useState(1);
+    const loginUser = getLoginUser();
+    const employeeNumber = loginUser?.employeeNumber ?? null;
 
-    const clock = useClock();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
 
-    const dashboardData = useDashboardData({
-        currentPage,
-        currentYear: clock.currentYear,
+    const {
+        data: dashboardData = null,
+        isLoading,
+        isError,
+        error,
+    } = useDashboardQuery({
+        employeeNumber,
+        year: currentYear,
+        month: currentMonth,
+        enabled: Boolean(employeeNumber),
     });
 
-    const pagination = useDashboardPagination({
-        currentPage,
-        setCurrentPage,
-        totalCount: dashboardData.totalCount,
-        itemsPerPage: DASHBOARD_ITEMS_PER_PAGE,
-    });
+    const checkInMutation = useCheckInAttendanceMutation();
+    const checkOutMutation = useCheckOutAttendanceMutation();
 
-    const attendance = useAttendance({
-        currentDate: clock.now,
-    });
+    const viewModel = useMemo(() => {
+        const summaryDto = dashboardData?.summary ?? {
+            monthlyWorkDays: 0,
+            monthlyWorkMinutes: 0,
+            averageWorkMinutes: 0,
+            remainingWorkDays: DEFAULT_TARGET_WORK_DAYS,
+        };
+
+        const todayAttendanceDto = dashboardData?.todayAttendance ?? {
+            workDate: null,
+            checkInTime: null,
+            checkOutTime: null,
+            attendanceStatus: null,
+            workMinutes: 0,
+        };
+
+        const attendanceActionState = getAttendanceActionState(todayAttendanceDto);
+
+        const summary = {
+            monthlyWorkDays: Number(summaryDto.monthlyWorkDays ?? 0),
+            monthlyWorkMinutesText: formatWorkMinutesToHourMinute(
+                summaryDto.monthlyWorkMinutes
+            ),
+            averageWorkMinutesText: formatWorkMinutesToHourMinute(
+                summaryDto.averageWorkMinutes
+            ),
+            remainingWorkDays: Number(
+                summaryDto.remainingWorkDays ?? DEFAULT_TARGET_WORK_DAYS
+            ),
+        };
+
+        const attendanceInfo = {
+            workDateText: formatDate(todayAttendanceDto.workDate),
+            checkInTimeText: formatTime(todayAttendanceDto.checkInTime),
+            checkOutTimeText: formatTime(todayAttendanceDto.checkOutTime),
+            workMinutesText: formatWorkMinutesToHourMinute(
+                todayAttendanceDto.workMinutes
+            ),
+            statusLabel: getAttendanceStatusLabel(
+                todayAttendanceDto.attendanceStatus
+            ),
+            statusClass: getAttendanceStatusClass(
+                todayAttendanceDto.attendanceStatus
+            ),
+            canCheckIn: attendanceActionState.canCheckIn,
+            canCheckOut: attendanceActionState.canCheckOut,
+        };
+
+        const history = (dashboardData?.attendanceHistories ?? []).map((item) => ({
+            id: item.attendanceId,
+            workDateText: formatDate(item.workDate),
+            checkInTimeText: formatTime(item.checkInTime),
+            checkOutTimeText: formatTime(item.checkOutTime),
+            workMinutesText: formatWorkMinutesToHourMinute(item.workMinutes),
+            statusLabel: getAttendanceStatusLabel(item.attendanceStatus),
+            statusClass: getAttendanceStatusClass(item.attendanceStatus),
+        }));
+
+        return {
+            summary,
+            attendanceInfo,
+            history,
+            progressSegments: buildDashboardSegments({
+                remainingWorkDays: summary.remainingWorkDays,
+                targetDays: DEFAULT_TARGET_WORK_DAYS,
+            }),
+        };
+    }, [dashboardData]);
+
+    const handleCheckIn = () => {
+        if (checkInMutation.isPending) return;
+        if (!viewModel.attendanceInfo.canCheckIn) return;
+        checkInMutation.mutate();
+    };
+
+    const handleCheckOut = () => {
+        if (checkOutMutation.isPending) return;
+        if (!viewModel.attendanceInfo.canCheckOut) return;
+        checkOutMutation.mutate();
+    };
 
     return {
-        employeeName: dashboardData.employeeName,
-        todayLabel: clock.todayLabel,
-        pendingApprovalCount: dashboardData.pendingApprovalCount,
-        absentTeamMemberCount: dashboardData.absentTeamMemberCount,
-        remainingVacationDays: dashboardData.remainingVacationDays,
-        usedVacationDays: dashboardData.usedVacationDays,
-        totalVacationDays: dashboardData.totalVacationDays,
-        vacationProgressPercent: dashboardData.vacationProgressPercent,
-        workedDays: dashboardData.workedDays,
-        targetWorkDays: dashboardData.targetWorkDays,
-
-        currentTime: clock.currentTime,
-        meridiem: clock.meridiem,
-        currentDateLabel: clock.currentDateLabel,
-
-        attendanceStatusLabel: attendance.attendanceStatusLabel,
-        isCheckInDisabled: attendance.isCheckInDisabled,
-        isCheckOutDisabled: attendance.isCheckOutDisabled,
-
-        activities: dashboardData.activities,
-        totalCount: pagination.totalCount,
-        currentPage: pagination.currentPage,
-        totalPages: pagination.totalPages,
-        startItemNumber: pagination.startItemNumber,
-        endItemNumber: pagination.endItemNumber,
-        filledSegmentCount: dashboardData.filledSegmentCount,
-
-        goToPage: pagination.goToPage,
-        goToPrevPage: pagination.goToPrevPage,
-        goToNextPage: pagination.goToNextPage,
-        handleCheckIn: attendance.handleCheckIn,
-        handleCheckOut: attendance.handleCheckOut,
-
-        isRecentActivitiesLoading: dashboardData.isRecentActivitiesLoading,
-        isRecentActivitiesError: dashboardData.isRecentActivitiesError,
-        isCheckingIn: attendance.isCheckingIn,
-        isCheckingOut: attendance.isCheckingOut,
+        loginUser,
+        summary: viewModel.summary,
+        attendanceInfo: viewModel.attendanceInfo,
+        history: viewModel.history,
+        progressSegments: viewModel.progressSegments,
+        handleCheckIn,
+        handleCheckOut,
+        isCheckingIn: checkInMutation.isPending,
+        isCheckingOut: checkOutMutation.isPending,
+        isLoading,
+        isError: !employeeNumber || isError,
+        error: !employeeNumber ? new Error("로그인 사용자 정보가 없습니다.") : error,
     };
 };
