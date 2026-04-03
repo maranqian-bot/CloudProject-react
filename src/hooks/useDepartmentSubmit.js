@@ -11,12 +11,14 @@ export const useDepartmentSubmit = () => {
     const updateMutation = useUpdateDepartmentMutation();
     const deleteMutation = useDeleteDepartmentMutation();
 
-    const handleSubmit = async (departmentId, formData, isEditMode) => {
+    const handleSubmit = async (departmentId, data, isEditMode) => {
 
             if (isEditMode) {
-                await updateMutation.mutateAsync({ departmentId, data: formData });
+                // 수정 시에는 어떤 부서(ID)를 고칠지, 데이터는 객체로 묶어서 전달!
+                await updateMutation.mutateAsync({ departmentId, data });
             } else {
-                await createMutation.mutateAsync(formData);
+                // 등록 시에는 데이터만 전달!
+                await createMutation.mutateAsync(data);
             }
             return true;
         };

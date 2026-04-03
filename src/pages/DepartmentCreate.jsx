@@ -10,7 +10,7 @@ function DepartmentCreate() {
             <Sidebar />
             <Header />
             <main>
-                <div className="container">
+                <div className="container">                     
                     <nav className="breadcrumb">
                         <span>조직 관리</span>
                         <span className="material-symbols-outlined separator">chevron_right</span>
@@ -25,9 +25,10 @@ function DepartmentCreate() {
                     </p>
 
                     <div className="content-grid">
-                        <div className="content-grid">
                             <div className="form-section">
-                                <DepartmentForm isEditMode={false} />
+                                <div className="card">
+                                    <DepartmentForm isEditMode={false} />
+                                </div>
                             </div>
 
                             <div className="info-sidebar">
@@ -58,8 +59,7 @@ function DepartmentCreate() {
                                     <div className="history-item">
                                         <div className="history-item-info">
                                             <p>AI Lab</p>
-                                            <p>TECH-04</p>
-                                        </div>
+                                            <p>TECH-04</p> 
                                         <span className="history-tag">2일 전</span>
                                     </div>
                                 </div>
@@ -72,7 +72,6 @@ function DepartmentCreate() {
                     </div>
                 </div>
             </main>
-
         </>
     );
 }
