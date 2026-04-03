@@ -4,6 +4,7 @@ import {
     formatVacationDays,
     getStatusClass,
     getVacationStatusLabel,
+    getVacationTypeLabel,
 } from "../../utils/vacationRequestUtils";
 
 function VacationManagementHistorySection({
@@ -40,50 +41,35 @@ function VacationManagementHistorySection({
                 <tbody>
                     {isLoading ? (
                         <tr>
-                            <td
-                                colSpan="4"
-                                style={{ textAlign: "center", padding: "40px" }}
-                            >
+                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
                                 데이터를 불러오는 중입니다...
                             </td>
                         </tr>
                     ) : isError ? (
                         <tr>
-                            <td
-                                colSpan="4"
-                                style={{ textAlign: "center", padding: "40px" }}
-                            >
+                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
                                 데이터를 불러오지 못했습니다.
                             </td>
                         </tr>
                     ) : currentPageData.length === 0 ? (
                         <tr>
-                            <td
-                                colSpan="4"
-                                style={{ textAlign: "center", padding: "40px" }}
-                            >
+                            <td colSpan="4" style={{ textAlign: "center", padding: "40px" }}>
                                 휴가 이력이 없습니다.
                             </td>
                         </tr>
                     ) : (
                         currentPageData.map((item) => (
-                            <tr key={item.id}>
-                                <td>{item.vacationType}</td>
-                                <td>
-                                    {formatDateRange(
-                                        item.startDate,
-                                        item.endDate
-                                    )}
-                                </td>
-                                <td>{formatVacationDays(item.days)}일</td>
+                            <tr key={item.vacationId}>
+                                <td>{getVacationTypeLabel(item.vacationType)}</td>
+                                <td>{formatDateRange(item.startDate, item.endDate)}</td>
+                                <td>{formatVacationDays(item.vacationDays)}</td>
                                 <td style={{ textAlign: "right" }}>
                                     <span
-                                        className={`status-badge ${getStatusClass(item.status)}`}
+                                        className={`status-badge ${getStatusClass(
+                                            item.vacationStatus
+                                        )}`}
                                     >
-                                        {getVacationStatusLabel(
-                                            item.status,
-                                            "history"
-                                        )}
+                                        {getVacationStatusLabel(item.vacationStatus, "history")}
                                     </span>
                                 </td>
                             </tr>

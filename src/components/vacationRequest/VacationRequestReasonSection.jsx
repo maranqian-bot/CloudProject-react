@@ -36,10 +36,11 @@ function VacationRequestReasonSection({
                             value={formData.vacationType}
                             onChange={onVacationTypeChange}
                         >
-                            <option value="교육">교육</option>
-                            <option value="병가">병가</option>
-                            <option value="경조사">경조사</option>
-                            <option value="기타">기타</option>
+                            <option value="">선택</option>
+                            <option value="ANNUAL">연차</option>
+                            <option value="SICK">병가</option>
+                            <option value="EVENT">경조사</option>
+                            <option value="ETC">기타</option>
                         </select>
                     </div>
 
