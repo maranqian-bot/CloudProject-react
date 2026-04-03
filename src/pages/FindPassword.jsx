@@ -3,9 +3,9 @@ import withPageStyle from "../utils/withPageStyle.jsx";
 import pageCss from "../styles/find-password.css?inline";
 import { useEffect, useState } from "react";
 import {
-    resetPasswordApi,
-    sendVerificationCodeApi,
-    verifyCodeApi,
+  resetPasswordApi,
+  sendVerificationCodeApi,
+  verifyCodeApi,
 } from "../api/passwordResetApi";
 
 function FindPassword() {
@@ -20,6 +20,9 @@ function FindPassword() {
   const [isVerified, setIsVerified] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const [sendMessage, setSendMessage] = useState("");
+  const [sendMessageType, setSendMessageType] = useState("");
 
   useEffect(() => {
     if (!isCodeSent || timeLeft <= 0) {
@@ -51,19 +54,19 @@ function FindPassword() {
       const result = await sendVerificationCodeApi(email);
       console.log("send-code success:", result);
 
-      alert(result.message || "인증번호가 전송되었습니다.");
+      setSendMessage(result.message || "인증번호가 전송되었습니다.");
+      setSendMessageType("success");
+
       setIsCodeSent(true);
       setIsVerified(false);
       setTimeLeft(180);
       setVerificationCode("");
     } catch (error) {
-        console.error("send-code error:", error);
-        console.error("response:", error.response);
-        console.error("data:", error.response?.data);
-        
       const errorMessage =
         error.response?.data?.message || "인증번호 전송에 실패했습니다.";
-      alert(errorMessage);
+
+      setSendMessage(errorMessage);
+      setSendMessageType("error");
     } finally {
       setLoading(false);
     }
@@ -117,6 +120,11 @@ function FindPassword() {
       return;
     }
 
+    if (!validatePassword(newPassword)) {
+      alert("비밀번호는 8자 이상이며, 영문/숫자/특수문자를 포함해야 합니다.");
+      return;
+    }
+
     if (!confirmPassword.trim()) {
       alert("새 비밀번호 확인을 입력해주세요.");
       return;
@@ -143,6 +151,11 @@ function FindPassword() {
     }
   };
 
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+    return regex.test(password);
+  };
+
   return (
     <>
       <header>
@@ -162,32 +175,51 @@ function FindPassword() {
             계정 보안을 위해 본인 인증 후 새로운 비밀번호를 설정해주세요.
           </p>
 
-          <form onSubmit={(e) => {
-                    e.preventDefault();
-                    handleResetPassword();
-                }}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleResetPassword();
+            }}
           >
             <div className="form-step">
               <span className="step-label">Step 01. 이메일 인증</span>
+
               <div className="input-group">
                 <label className="floating-label">Email Address</label>
+
                 <div className="input-with-button">
-                  <input 
-                    placeholder="example@nexuspro.com" 
+                  <input
+                    placeholder="example@nexuspro.com"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                />
-                <button 
-                    className="btn-secondary" 
+                    disabled={loading || isVerified}
+                  />
+                  <button
+                    className="btn-secondary"
                     type="button"
                     onClick={handleSendCode}
                     disabled={loading}
-                >
-                    인증번호 전송
-                </button>
+                  >
+                    {loading
+                      ? "전송 중..."
+                      : isCodeSent
+                        ? "인증번호 재전송"
+                        : "인증번호 전송"}
+                  </button>
                 </div>
+                {sendMessage && (
+                  <p
+                    style={{
+                      marginTop: "0.5rem",
+                      color:
+                        sendMessageType === "success" ? "#2f9e44" : "#d93025",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    {sendMessage}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -197,15 +229,15 @@ function FindPassword() {
                 <label className="floating-label">Verification Code</label>
                 <div className="input-with-button">
                   <div style={{ position: "relative", flexGrow: 1 }}>
-                    <input 
-                        placeholder="6자리 숫자 입력" 
-                        type="text"
-                        value={verificationCode}
-                        onChange={(e) => setVerificationCode(e.target.value)}
-                        disabled={!isCodeSent || loading} 
+                    <input
+                      placeholder="6자리 숫자 입력"
+                      type="text"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      disabled={!isCodeSent || loading}
                     />
-                    {isCodeSent && timeLeft > 0 && (
-                        <span className="timer">{formatTime(timeLeft)}</span>
+                    {isCodeSent && timeLeft > 0 && !isVerified && (
+                      <span className="timer">{formatTime(timeLeft)}</span>
                     )}
                   </div>
                   <button
@@ -213,15 +245,21 @@ function FindPassword() {
                     style={{ padding: "0 1.5rem" }}
                     type="button"
                     onClick={handleVerifyCode}
-                    disabled={!isCodeSent || loading}
+                    disabled={!isCodeSent || loading || isVerified}
                   >
                     확인
                   </button>
                 </div>
                 {isVerified && (
-                    <p style={{ marginTop: "0.5rem", color: "#2f9e44", fontSize: "0.9rem" }}>
-                        이메일 인증이 완료되었습니다.
-                    </p>
+                  <p
+                    style={{
+                      marginTop: "0.5rem",
+                      color: "#2f9e44",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    이메일 인증이 완료되었습니다.
+                  </p>
                 )}
               </div>
             </div>
@@ -237,31 +275,43 @@ function FindPassword() {
               >
                 <div className="input-group">
                   <label className="floating-label">New Password</label>
-                  <input 
-                    placeholder="새로운 비밀번호" 
-                    type="password" 
+                  <input
+                    placeholder="새로운 비밀번호"
+                    type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     disabled={!isVerified || loading}
-                />
+                  />
+
+                  {newPassword && (
+                    <p
+                      style={{
+                        fontSize: "0.85rem",
+                        color: "#868e96",
+                        marginTop: "4px",
+                      }}
+                    >
+                      비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.
+                    </p>
+                  )}
                 </div>
                 <div className="input-group">
                   <label className="floating-label">Confirm Password</label>
-                  <input 
-                    placeholder="새로운 비밀번호 확인" 
-                    type="password" 
+                  <input
+                    placeholder="새로운 비밀번호 확인"
+                    type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={!isVerified || loading}
-                />
+                  />
                 </div>
               </div>
             </div>
 
-            <button 
-                className="submit-btn" 
-                type="submit"
-                disabled={!isVerified || loading}
+            <button
+              className="submit-btn"
+              type="submit"
+              disabled={!isVerified || loading}
             >
               비밀번호 변경
             </button>
