@@ -1,11 +1,12 @@
 # HR Management System (근태 & 인사 관리 시스템)
 
-
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![React Router](https://img.shields.io/badge/React%20Router-6-CA4245?logo=reactrouter&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-State%20Management-000000)
 ![TanStack Query](https://img.shields.io/badge/TanStack%20Query-Server%20State-FF4154?logo=reactquery&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-HTTP%20Client-5A29E4)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 
 ---
 
@@ -20,13 +21,80 @@
 
 ---
 
-## 주요 기능
+## 시작 가이드
 
-- 로그인 / 인증
-- 직원 관리
-- 부서 관리
-- 근태 관리
-- 휴가 관리
+### Prerequisites
+- Node.js v18.x 이상
+- npm 9.x 이상
+
+### Installation
+```bash
+# 1. 레포지토리 클론
+$ git clone [https://github.com/your-repo/hr-management-frontend.git](https://github.com/your-repo/hr-management-frontend.git)
+
+# 2. 프로젝트 폴더 진입
+$ cd hr-management-frontend
+
+# 3. 의존성 설치
+$ npm install
+
+# 4. 환경 변수 설정
+# 루트 디렉토리에 .env 파일을 생성하고 아래 내용을 작성해주세요.
+REACT_APP_API_BASE_URL=http://localhost:8080/api
+
+# 5. 프로젝트 실행
+$ npm run dev
+```
+
+
+---
+
+## 더미데이터 테스트 (Json-Server)
+db.json에 더미데이터를 넣어 테스트할 수 있습니다.
+
+routes.json 파일은 아래와 같이 api를 작성합니다.
+
+Json-Server를 실행합니다.
+
+db.json:
+
+    "summary": [
+    {
+      "id": 1,
+      "workDays": 20,
+      "lateCount": 2,
+      "absentCount": 1,
+      "attendanceScore": 94.8
+    }
+    ]
+
+routes.json:
+
+    {
+      "/attendance/summary": "/summary",
+      "/attendance/history": "/history"
+    }
+
+Json-Server 켜기:
+
+    npm install -g json-server@0.17.4
+    json-server --watch db.json --routes routes.json --port 3001
+
+
+---
+
+## 폴더 구조
+```
+src/
+ ├── api/           # Axios 인스턴스 및 엔드포인트별 API 호출 함수
+ ├── components/    # 재사용 가능한 공통 UI 컴포넌트
+ ├── hooks/         # 커스텀 훅 (비즈니스 로직 및 상태 관리)
+ ├── pages/         # React Router에 연결되는 화면별 페이지 컴포넌트
+ ├── query/         # TanStack Query 관련 쿼리(Query) 및 뮤테이션(Mutation) 로직
+ ├── styles/        # 전역 스타일링 및 테마 설정
+ ├── store/         # Zustand 스토어 (클라이언트 상태 관리)
+ └── utils/         # 공용 유틸리티 함수 및 포맷터
+```
 
 ---
 
@@ -112,82 +180,14 @@
     <img width="80%" src="https://github.com/user-attachments/assets/125d6285-7459-4987-8912-cc269f45eabc" />
   </p>
 </details>
-
----
-
-## 기술 스택
-
-### Front
-- React 18
-- react-router
-- zustand
-- Tanstack Query
-- Axios
-
----
-
-## 로컬 실행 방법
-
-본 프로젝트는 데이터베이스 정보를 코드에 직접 작성하지 않고 환경 변수(Environment Variables)로 설정하여 사용합니다.
-
-프로젝트 실행 전에 아래 환경 변수를 반드시 설정해주세요.
-
-#### 필수 환경 변수
-
-- DB_URL
-- DB_USERNAME
-- DB_PASSWORD
-
-#### 예시
-
-DB_URL=jdbc:mysql://localhost:3306/cloud_project  
-DB_USERNAME=root  
-DB_PASSWORD=your_password  
-
-#### 주의사항
-
-환경 변수를 설정하지 않으면 프로젝트 실행 시 오류가 발생합니다.
-
-
-## 더미데이터 테스트 (Json-Server)
-db.json에 더미데이터를 넣어 테스트할 수 있습니다.
-
-routes.json 파일은 아래와 같이 api를 작성합니다.
-
-Json-Server를 실행합니다.
-
-db.json:
-
-    "summary": [
-    {
-      "id": 1,
-      "workDays": 20,
-      "lateCount": 2,
-      "absentCount": 1,
-      "attendanceScore": 94.8
-    }
-    ]
-
-routes.json:
-
-    {
-      "/attendance/summary": "/summary",
-      "/attendance/history": "/history"
-    }
-
-Json-Server 켜기:
-
-    npm install -g json-server@0.17.4
-    json-server --watch db.json --routes routes.json --port 3001
-
     
 ---
 
 ## 팀원 및 역할
 | 이름 | 역할 | 기능 구현 |
 |------|------|------|
-| 마은재 ([maranqian-bot](https://github.com/maranqian-bot)) | 팀장 | CICD 파이프라인 구축, 대시보드 기능 구현(예시) |
-| 김성원 ([gungang1212-tech](https://github.com/gungang1212-tech)) | 팀원 | 채울 예정 |
-| 이가연 ([ixxveon](https://github.com/ixxveon)) | 팀원 | S3 + CloudFront 구축, 근태 관리 및 로그인 기능 구현 |
-| 신보라 ([sbr7518-bit](https://github.com/sbr7518-bit)) | 팀원 | 채울 예정 |
+| 마은재 ([maranqian-bot](https://github.com/maranqian-bot)) | 팀장 | 휴가관리 및 대시보드 기능 구현 |
+| 김성원 ([gungang1212-tech](https://github.com/gungang1212-tech)) | 팀원 | 직원관리 기능 구현 |
+| 이가연 ([ixxveon](https://github.com/ixxveon)) | 팀원 | 근태관리 및 로그인 기능 구현 |
+| 신보라 ([sbr7518-bit](https://github.com/sbr7518-bit)) | 팀원 | 부서관리 기능 구현 |
 
