@@ -18,7 +18,6 @@ function AttendanceHistoryTable({
   goToPage,
   goToPrevPage,
   goToNextPage,
-  onExcelExport,
 }) {
 
   const employeeId = 1;
