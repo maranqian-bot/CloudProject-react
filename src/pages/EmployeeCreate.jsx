@@ -18,7 +18,7 @@ function EmployeeCreate() {
         password: "",
         departmentId: "",    // (숫자타입!! 아래에서 변환해주었음.)부서 기본키
         hireDate: "",  // 입사일
-        role: ""   // 시스템 역할
+        role : "EMPLOYEE",   // 시스템 역할
 
     });
 
@@ -33,7 +33,7 @@ function EmployeeCreate() {
         onSuccess: () => {
             alert("직원이 성공적으로 등록되었습니다.");    // 저장 알림 띄우기
             queryClient.invalidateQueries({ queryKey: ["employees", "list"] }); // 추가 된 데이터 반영.
-            navigate("/employee/management/");
+            navigate("/employee-management");
         },
         onError: (error) => {
             alert("직원 등록에 실패했습니다." + error.message);  //에러 메세지 띄워주기.
@@ -43,7 +43,7 @@ function EmployeeCreate() {
 
     const handleChange = (e) => {           // 상태변경함수를 입력이 들어올 떄에 실행
         const { name, value } = e.target;
-        const updatedValue = name === "deptId" ? Number(value) : value; // deptId는 숫자로 변환
+        const updatedValue = name === "departmentId" ? Number(value) : value; // deptId는 숫자로 변환
         setFormData({
             ...formData,            // 입력받지 않은건 기존값으로 유지.
             [name]: updatedValue   // 입력으로 받은 것만 갱신해줌.

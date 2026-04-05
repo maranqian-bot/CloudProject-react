@@ -43,7 +43,7 @@ function App() {
 
         <Route path="/employee-management" element={<EmployeeManagement />} />
         <Route path="/employee-create" element={<EmployeeCreate />} />
-        <Route path="/employee-edit" element={<EmployeeEdit />} />
+        <Route path="/employee-edit/:employeeId" element={<EmployeeEdit />} />
 
         <Route path="/department-management" element={<DepartmentManagement />} />
         <Route path="/department-create" element={<DepartmentCreate />} />
