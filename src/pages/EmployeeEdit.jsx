@@ -13,20 +13,18 @@ function EmployeeEdit() {
 
     const {
         employee: resDto,
-        attendanceHistory, // 👈 훅에서 리턴하는 이 값을 추가!
+        attendanceHistory,
         pendingVacation,
         loading: isLoading,
         isError,
         updateEmployee,
         updatePending,
-        // 페이징 관련 (필요 시 UI 하단에 사용)
         currentPage, totalPages, pageNumbers,
         totalCount, startItemNumber, endItemNumber,
         changePage, goToPrevPage, goToNextPage
     } = employeeQuery(employeeId);
 
     const attPage = usePagination(resDto?.attendanceHistory || [], 5, 3);
-
     const vacPage = usePagination(resDto?.pendingVacation || [], 5, 3);
 
     const [formData, setFormData] = useState({
@@ -65,7 +63,6 @@ function EmployeeEdit() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        // 함수형 업데이트로 상태 손실 방지
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -74,8 +71,6 @@ function EmployeeEdit() {
 
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
-
-        // 훅에 이미 onSuccess 로직이 있으므로 데이터만 전달하면 끝!
         updateEmployee({
             id: employeeId,
             departmentId: formData.departmentId,
@@ -83,7 +78,7 @@ function EmployeeEdit() {
         });
     };
 
-    return(
+    return (
         <>
             <Sidebar />
             <Header />
@@ -120,7 +115,6 @@ function EmployeeEdit() {
 
                         <div className="dashboard-grid">
 
-                            {/* ✅ 왼쪽 컬럼 */}
                             <div className="column">
                                 <section className="section-card">
                                     <div className="card-header">
@@ -309,7 +303,6 @@ function EmployeeEdit() {
                                 </section>
                             </div>
 
-                            {/* ✅ 오른쪽 컬럼 - 여기가 핵심 수정 부분 */}
                             <div className="column">
                                 <section className="section-card">
                                     <div className="card-header">
@@ -424,10 +417,21 @@ function EmployeeEdit() {
                                                 {vacPage.currentData && vacPage.currentData.length > 0 ? (
                                                     vacPage.currentData.map((vacation, index) => (
                                                         <tr key={vacation.vacationId || index}>
-                                                            <td>{vacation.vacationType}</td>
+                                                            <td>
+                                                                {vacation.vacationType === 'ANNUAL' ? '연차' :
+                                                                    vacation.vacationType === 'HALF_AM' ? '반차(오전)' :
+                                                                        vacation.vacationType === 'HALF_PM' ? '반차(오후)' :
+                                                                            vacation.vacationType === 'SICK' ? '병가' :
+                                                                                vacation.vacationType === 'EVENT' ? '경조사' :
+                                                                                    vacation.vacationType === 'ETC' ? '기타' : vacation.vacationType}
+                                                            </td>
                                                             <td>{vacation.startDate} ~ {vacation.endDate}</td>
                                                             <td>{vacation.vacationDays}일</td>
-                                                            <td>{vacation.vacationStatus}</td>
+                                                            <td>
+                                                                {vacation.vacationStatus === 'PENDING' ? '대기중' :
+                                                                    vacation.vacationStatus === 'APPROVED' ? '승인' :
+                                                                        vacation.vacationStatus === 'REJECTED' ? '반려' : vacation.vacationStatus}
+                                                            </td>
                                                         </tr>
                                                     ))
                                                 ) : (
@@ -496,7 +500,6 @@ function EmployeeEdit() {
                                     </div>
                                 </section>
                             </div>
-                            {/* ✅ 오른쪽 컬럼 끝 */}
 
                         </div>
                     </div>
