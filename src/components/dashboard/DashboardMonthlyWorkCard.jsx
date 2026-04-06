@@ -9,28 +9,28 @@ function DashboardMonthlyWorkCard({
     }));
 
     return (
-        <div className="card monthly-work-card">
-            <div className="card-label-row">
-                <span className="card-label">이번 달 근무 현황</span>
+        <div className="card stat-card">
+            <div className="stat-header">
+                <div className="stat-icon icon-orange">
+                    <span className="material-symbols-outlined">work_history</span>
+                </div>
+
+                <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                    <div className="stat-title">이번 달 근무</div>
+                    <div className="stat-desc">출근 기록 일수</div>
+                </div>
             </div>
 
-            <div className="work-summary-row">
-                <p className="work-summary-value">
-                    {workedDays}
-                    <span className="work-summary-unit">일</span>
-                </p>
-                <p className="work-summary-target">
-                    / {targetWorkDays}일
-                </p>
+            <div className="stat-value-box">
+                <span className="stat-value">{workedDays}</span>
+                <span className="stat-unit">/ {targetWorkDays}일</span>
             </div>
 
-            <div className="work-progress-segments">
+            <div className="segments">
                 {segments.map((segment) => (
                     <div
                         key={segment.id}
-                        className={`progress-segment ${
-                            segment.filled ? "filled" : ""
-                        }`}
+                        className={`segment ${segment.filled ? "fill" : ""}`}
                     />
                 ))}
             </div>
