@@ -5,6 +5,7 @@ import pageCss from "../styles/employee-edit.css?inline";
 import { useState, useEffect } from "react";
 import employeeQuery from "../query/employeeQuery.js";
 import { useNavigate, useParams } from "react-router-dom";
+import { usePagination } from "../hooks/usePagination";
 
 function EmployeeEdit() {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ function EmployeeEdit() {
 
     const {
         employee: resDto,
+        attendanceHistory, // 👈 훅에서 리턴하는 이 값을 추가!
+        pendingVacation,
         loading: isLoading,
         isError,
         updateEmployee,
@@ -21,6 +24,10 @@ function EmployeeEdit() {
         totalCount, startItemNumber, endItemNumber,
         changePage, goToPrevPage, goToNextPage
     } = employeeQuery(employeeId);
+
+    const attPage = usePagination(resDto?.attendanceHistory || [], 5, 3);
+
+    const vacPage = usePagination(resDto?.pendingVacation || [], 5, 3);
 
     const [formData, setFormData] = useState({
         employeeId: "",
@@ -75,14 +82,14 @@ function EmployeeEdit() {
             reqDto: formData
         });
     };
-    return (
 
+    return(
         <>
             <Sidebar />
             <Header />
 
             <main className="content">
-                <form onSubmit={handleSubmit} className="container">
+                <form onSubmit={handleSubmit}>
                     <div className="container">
                         <div className="page-header">
                             <div>
@@ -96,20 +103,15 @@ function EmployeeEdit() {
                                 <button
                                     className="btn-outline"
                                     type="button"
-                                    onClick={() => navigate("/employee-management")} // navigate 사용
+                                    onClick={() => navigate("/employee-management")}
                                 >
                                     취소
                                 </button>
 
                                 <button
                                     className="btn-primary"
-                                    type="button"
-                                    onClick={() => updateEmployee({
-                                        id: employeeId,
-                                        departmentId: formData.departmentId,
-                                        reqDto: formData
-                                    })}
-                                    disabled={updatePending} // 저장 중일 때 클릭 방지
+                                    type="submit"
+                                    disabled={updatePending}
                                 >
                                     {updatePending ? "저장 중..." : "수정 내용 저장"}
                                 </button>
@@ -117,6 +119,8 @@ function EmployeeEdit() {
                         </div>
 
                         <div className="dashboard-grid">
+
+                            {/* ✅ 왼쪽 컬럼 */}
                             <div className="column">
                                 <section className="section-card">
                                     <div className="card-header">
@@ -125,7 +129,7 @@ function EmployeeEdit() {
                                             기본 정보
                                         </h3>
                                     </div>
-                                    {/* 사번  : 사번은 수정불가함 */}
+
                                     <div className="card-body">
                                         <div className="form-row">
                                             <div className="form-group">
@@ -138,7 +142,6 @@ function EmployeeEdit() {
                                                     readOnly
                                                 />
                                             </div>
-                                            {/* 이름 */}
                                             <div className="form-group">
                                                 <label className="label-text">이름</label>
                                                 <input
@@ -150,7 +153,7 @@ function EmployeeEdit() {
                                                 />
                                             </div>
                                         </div>
-                                        {/* 이메일 */}
+
                                         <div className="form-group">
                                             <label className="label-text">이메일</label>
                                             <input
@@ -161,7 +164,7 @@ function EmployeeEdit() {
                                                 onChange={handleChange}
                                             />
                                         </div>
-                                        {/* 비번 */}
+
                                         <div className="form-group">
                                             <label className="label-text">비밀번호</label>
                                             <div className="password-container">
@@ -189,16 +192,16 @@ function EmployeeEdit() {
                                                 <select
                                                     className="input-field"
                                                     name="departmentId"
-                                                    value={formData.departmnetId}
-                                                    onChange={handleChange}>
+                                                    value={formData.departmentId}
+                                                    onChange={handleChange}
+                                                >
                                                     <option value="">부서를 선택하세요</option>
                                                     <option value="1">인사부 (HR)</option>
-                                                    <option value="2">엔지니어링  </option>
+                                                    <option value="2">엔지니어링</option>
                                                     <option value="3">디자인</option>
                                                     <option value="4">영업부</option>
                                                 </select>
                                             </div>
-                                            {/* 직책 */}
                                             <div className="form-group">
                                                 <label className="label-text">직책</label>
                                                 <select
@@ -206,7 +209,8 @@ function EmployeeEdit() {
                                                     id="position"
                                                     name="position"
                                                     value={formData.position}
-                                                    onChange={handleChange}>
+                                                    onChange={handleChange}
+                                                >
                                                     <option value="사원">사원</option>
                                                     <option value="대리">대리</option>
                                                     <option value="과장">과장</option>
@@ -215,7 +219,7 @@ function EmployeeEdit() {
                                                 </select>
                                             </div>
                                         </div>
-                                        {/* 입사일 */}
+
                                         <div className="form-row">
                                             <div className="form-group">
                                                 <label className="label-text">입사일</label>
@@ -227,7 +231,6 @@ function EmployeeEdit() {
                                                     onChange={handleChange}
                                                 />
                                             </div>
-                                            {/* 퇴사일 */}
                                             <div className="form-group">
                                                 <label className="label-text">퇴사일</label>
                                                 <input
@@ -245,48 +248,37 @@ function EmployeeEdit() {
                                 <section className="section-card">
                                     <div className="card-header">
                                         <h3 className="card-title">
-                                            <span
-                                                className="material-symbols-outlined">security</span>
+                                            <span className="material-symbols-outlined">security</span>
                                             권한 및 상태
                                         </h3>
                                     </div>
-                                    {/* 시스템역할  */}
+
                                     <div className="card-body">
                                         <div className="form-group">
                                             <label className="label-text">시스템 역할</label>
-                                            <p
-                                                style={{
-                                                    fontSize: "12px",
-                                                    color: "#5F6368",
-                                                    marginBottom: "12px",
-                                                }}
-                                            >
+                                            <p style={{ fontSize: "12px", color: "#5F6368", marginBottom: "12px" }}>
                                                 사용자의 접근 권한 범위를 결정합니다.
                                             </p>
-
                                             <div className="roles-container">
                                                 <button
-                                                    className={`role-btn ${formData.role === "EMPLOYEE" ? "active" : " "}`}
+                                                    className={`role-btn ${formData.role === "EMPLOYEE" ? "active" : ""}`}
                                                     type="button"
                                                     onClick={() => setFormData({ ...formData, role: "EMPLOYEE" })}
-
                                                 >
                                                     직원
                                                 </button>
                                                 <button
-                                                    className="role-btn active"
+                                                    className={`role-btn ${formData.role === "MANAGER" ? "active" : ""}`}
                                                     type="button"
-                                                    name="role"
-                                                    value={formData.role}
-                                                    onChange={handleChange}>
+                                                    onClick={() => setFormData({ ...formData, role: "MANAGER" })}
+                                                >
                                                     매니저
                                                 </button>
                                                 <button
-                                                    className="role-btn"
+                                                    className={`role-btn ${formData.role === "ADMIN" ? "active" : ""}`}
                                                     type="button"
-                                                    name="role"
-                                                    value={formData.role}
-                                                    onChange={handleChange}>
+                                                    onClick={() => setFormData({ ...formData, role: "ADMIN" })}
+                                                >
                                                     관리자
                                                 </button>
                                             </div>
@@ -294,21 +286,20 @@ function EmployeeEdit() {
 
                                         <div className="status-toggle-row">
                                             <div>
-                                                <h4 style={{ fontSize: "14px", fontWeight: 700 }}>
-                                                    계정 활성화 상태
-                                                </h4>
+                                                <h4 style={{ fontSize: "14px", fontWeight: 700 }}>계정 활성화 상태</h4>
                                                 <p style={{ fontSize: "12px", color: "#5F6368" }}>
                                                     비활성화 시 시스템 접근이 차단됩니다.
                                                 </p>
                                             </div>
-                                            {/* 상태 입력란 */}
                                             <div style={{ display: "flex", alignItems: "center" }}>
                                                 <label className="toggle-switch">
                                                     <input
-                                                        defaultChecked type="checkbox"
+                                                        defaultChecked
+                                                        type="checkbox"
                                                         name="status"
                                                         value={formData.status}
-                                                        onChange={handleChange} />
+                                                        onChange={handleChange}
+                                                    />
                                                     <span className="slider"></span>
                                                 </label>
                                                 <span className="status-label">Active</span>
@@ -318,13 +309,12 @@ function EmployeeEdit() {
                                 </section>
                             </div>
 
+                            {/* ✅ 오른쪽 컬럼 - 여기가 핵심 수정 부분 */}
                             <div className="column">
                                 <section className="section-card">
                                     <div className="card-header">
                                         <h3 className="card-title">
-                                            <span className="material-symbols-outlined">
-                                                history_toggle_off
-                                            </span>
+                                            <span className="material-symbols-outlined">history_toggle_off</span>
                                             근태 기록
                                         </h3>
                                     </div>
@@ -340,75 +330,70 @@ function EmployeeEdit() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {resDto?.attendanceHistory && resDto.attendanceHistory.length > 0 ? (
-                                                    resDto.attendanceHistory.map((attendance, index) => (
+                                                {attPage.currentData && attPage.currentData.length > 0 ? (
+                                                    attPage.currentData.map((attendance, index) => (
                                                         <tr key={attendance.attendanceId || index}>
-                                                            <td>{attendance.workDate}</td>
+                                                            <td>{attendance.workDate || "-"}</td>
                                                             <td>
                                                                 {attendance.checkInTime
-                                                                    ? attendance.checkInTime.toString().substring(11, 16)
+                                                                    ? String(attendance.checkInTime).substring(11, 16)
                                                                     : "-"}
                                                             </td>
                                                             <td>
                                                                 {attendance.checkOutTime
-                                                                    ? attendance.checkOutTime.toString().substring(11, 16)
+                                                                    ? String(attendance.checkOutTime).substring(11, 16)
                                                                     : "-"}
                                                             </td>
                                                             <td>
-                                                                <span className={`status-badge ${attendance.attendanceStatus}`}>
-                                                                    {attendance.attendanceStatus === 'NORMAL' ? '정상' :
-                                                                        attendance.attendanceStatus === 'LATE' ? '지각' :
-                                                                            attendance.attendanceStatus === 'EARLYLEAVE' ? '조퇴' :
-                                                                                attendance.attendanceStatus === 'ABSENT' ? '결근' :
-                                                                                    attendance.attendanceStatus === 'VACATION' ? '휴가' :
-                                                                                        attendance.attendanceStatus === 'OVERTIME' ? '연장근무' : '기타'}
+                                                                <span className={`status-badge ${attendance.attendanceStatus?.toLowerCase()}`}>
+                                                                    {attendance.attendanceStatus === "NORMAL" ? "정상" :
+                                                                        attendance.attendanceStatus === "LATE" ? "지각" :
+                                                                            attendance.attendanceStatus === "EARLYLEAVE" ? "조퇴" :
+                                                                                attendance.attendanceStatus === "ABSENT" ? "결근" :
+                                                                                    attendance.attendanceStatus === "VACATION" ? "휴가" :
+                                                                                        attendance.attendanceStatus === "OVERTIME" ? "연장근무" : "기타"}
                                                                 </span>
                                                             </td>
                                                         </tr>
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="4" style={{ textAlign: 'center' }}>데이터가 없습니다.</td>
+                                                        <td colSpan="4" style={{ textAlign: "center", padding: "20px" }}>
+                                                            근태 기록이 없습니다.
+                                                        </td>
                                                     </tr>
                                                 )}
                                             </tbody>
                                         </table>
 
                                         <div className="table-footer">
-                                            {/* 1. 하단 정보: 훅에서 가져온 실제 숫자로 연결 */}
                                             <p className="footer-info">
-                                                전체 {totalCount}개의 근태 기록 중 {startItemNumber}~{endItemNumber}번째 표시 중
+                                                전체 {resDto?.attendanceHistory?.length || 0}개의 근태 기록 중 {attPage.startItemNumber}~{attPage.endItemNumber}번째 표시 중
                                             </p>
-
                                             <div className="pagination">
-                                                {/* 2. 이전 버튼: 1페이지일 때 비활성화 */}
                                                 <button
                                                     className="page-btn"
                                                     type="button"
-                                                    onClick={goToPrevPage}
-                                                    disabled={currentPage === 1}
+                                                    onClick={attPage.goToPrevPage}
+                                                    disabled={attPage.currentPage === 1}
                                                 >
                                                     <span className="material-symbols-outlined">chevron_left</span>
                                                 </button>
-
-                                                {/* 3. 페이지 번호 리스트: 훅의 pageNumbers를 활용해 자동으로 생성 */}
-                                                {pageNumbers.map((number) => (
+                                                {attPage.pageNumbers.map((number) => (
                                                     <button
                                                         key={number}
                                                         type="button"
-                                                        className={`page-btn ${currentPage === number ? "active" : ""}`}
-                                                        onClick={() => changePage(number)}
+                                                        className={`page-btn ${attPage.currentPage === number ? "active" : ""}`}
+                                                        onClick={() => attPage.goToPage(number)}
                                                     >
                                                         {number}
                                                     </button>
                                                 ))}
-
-                                                {/* 4. 다음 버튼: 마지막 페이지일 때 비활성화 */}
                                                 <button
                                                     className="page-btn"
                                                     type="button"
-                                                    onClick={goToNextPage}
-                                                    disabled={currentPage === totalPages}
+                                                    onClick={attPage.goToNextPage}
+                                                    disabled={attPage.currentPage === attPage.totalPages}
                                                 >
                                                     <span className="material-symbols-outlined">chevron_right</span>
                                                 </button>
@@ -420,9 +405,7 @@ function EmployeeEdit() {
                                 <section className="section-card">
                                     <div className="card-header">
                                         <h3 className="card-title">
-                                            <span className="material-symbols-outlined">
-                                                event_available
-                                            </span>
+                                            <span className="material-symbols-outlined">event_available</span>
                                             최근 휴가 신청 내역
                                         </h3>
                                     </div>
@@ -438,72 +421,53 @@ function EmployeeEdit() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {resDto?.pendingVacation && resDto.pendingVacation.length > 0 ? (
-                                                    resDto.pendingVacation.map((vacation, index) => (
+                                                {vacPage.currentData && vacPage.currentData.length > 0 ? (
+                                                    vacPage.currentData.map((vacation, index) => (
                                                         <tr key={vacation.vacationId || index}>
-                                                            <td>
-                                                                <div className="leave-type">
-                                                                    <span className="main">{vacation.vacationType}</span>
-                                                                    {/* 상세 사유는 API 데이터가 있을 경우 출력, 없으면 기본값 */}
-                                                                    <span className="sub">{vacation.reason || "정기 휴가"}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                {vacation.startDate} ~ {vacation.endDate}
-                                                            </td>
-                                                            <td style={{ fontWeight: 700 }}>
-                                                                {vacation.vacationDays}일
-                                                            </td>
-                                                            <td>
-                                                                <div className="status-dot-container">
-                                                                    <span className={`status-dot dot-${vacation.vacationStatus?.toLowerCase()}`}></span>
-                                                                    <span className={`text-color-${vacation.vacationStatus?.toLowerCase()}`}>
-                                                                        {vacation.vacationStatus === 'APPROVED' ? '승인' :
-                                                                            vacation.vacationStatus === 'PENDING' ? '대기' :
-                                                                                vacation.vacationStatus === 'REJECTED' ? '반려' : '기타'}
-                                                                    </span>
-                                                                </div>
-                                                            </td>
+                                                            <td>{vacation.vacationType}</td>
+                                                            <td>{vacation.startDate} ~ {vacation.endDate}</td>
+                                                            <td>{vacation.vacationDays}일</td>
+                                                            <td>{vacation.vacationStatus}</td>
                                                         </tr>
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan="4" style={{ textAlign: 'center' }}>휴가 신청 내역이 없습니다.</td>
+                                                        <td colSpan="4" style={{ textAlign: "center" }}>
+                                                            휴가 신청 내역이 없습니다.
+                                                        </td>
                                                     </tr>
                                                 )}
                                             </tbody>
                                         </table>
 
-                                        {/* 페이징 영역: employeeQuery 훅의 변수들과 연결 */}
                                         <div className="table-footer">
                                             <p className="footer-info">
-                                                전체 {totalCount}개의 휴가 내역 중 {startItemNumber}~{endItemNumber}번째 표시 중
+                                                전체 {resDto?.pendingVacation?.length || 0}개의 내역 중 {vacPage.startItemNumber}~{vacPage.endItemNumber}번째 표시 중
                                             </p>
                                             <div className="pagination">
                                                 <button
                                                     className="page-btn"
                                                     type="button"
-                                                    onClick={goToPrevPage}
-                                                    disabled={currentPage === 1}
+                                                    onClick={vacPage.goToPrevPage}
+                                                    disabled={vacPage.currentPage === 1}
                                                 >
                                                     <span className="material-symbols-outlined">chevron_left</span>
                                                 </button>
-
-                                                {pageNumbers.map((number) => (
+                                                {vacPage.pageNumbers.map((number) => (
                                                     <button
                                                         key={number}
-                                                        className={`page-btn ${currentPage === number ? "active" : ""}`}
-                                                        onClick={() => changePage(number)}
+                                                        type="button"
+                                                        className={`page-btn ${vacPage.currentPage === number ? "active" : ""}`}
+                                                        onClick={() => vacPage.goToPage(number)}
                                                     >
                                                         {number}
                                                     </button>
                                                 ))}
-
                                                 <button
                                                     className="page-btn"
                                                     type="button"
-                                                    onClick={goToNextPage}
-                                                    disabled={currentPage === totalPages}
+                                                    onClick={vacPage.goToNextPage}
+                                                    disabled={vacPage.currentPage === vacPage.totalPages}
                                                 >
                                                     <span className="material-symbols-outlined">chevron_right</span>
                                                 </button>
@@ -521,9 +485,7 @@ function EmployeeEdit() {
                                                 / {resDto?.totalLeaves || 15}일
                                             </span>
                                         </div>
-
                                         <div className="progress-bar-container">
-                                            {/* 데이터에 따라 게이지 너비 자동 조절 */}
                                             <div
                                                 className="progress-bar"
                                                 style={{
@@ -534,13 +496,15 @@ function EmployeeEdit() {
                                     </div>
                                 </section>
                             </div>
-                        </div>
+                            {/* ✅ 오른쪽 컬럼 끝 */}
 
-                        <footer className="page-footer">
-                            <span>마지막 업데이트: 2024년 5월 24일 14:30 (관리자: 이현우)</span>
-                            <span>Nexus Pro HR v2.4.0</span>
-                        </footer>
+                        </div>
                     </div>
+
+                    <footer className="page-footer">
+                        <span>마지막 업데이트: 2024년 5월 24일 14:30 (관리자: 이현우)</span>
+                        <span>Nexus Pro HR v2.4.0</span>
+                    </footer>
                 </form>
             </main>
         </>
