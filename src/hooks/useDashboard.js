@@ -37,7 +37,7 @@ const getClockViewModel = (date) => {
     return {
         currentTime: `${displayHour}:${minutes}`,
         meridiem,
-        currentDateLabel: formatDate(date),
+        currentDateLabel: `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`,
         todayLabel: getTodayLabel(date),
     };
 };
