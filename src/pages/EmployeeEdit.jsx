@@ -11,6 +11,9 @@ function EmployeeEdit() {
     const navigate = useNavigate();
     const { employeeId } = useParams();
 
+    const [passwordError, setPasswordError] = useState("");
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
     const {
         employee: resDto,
         attendanceHistory,
@@ -63,6 +66,15 @@ function EmployeeEdit() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === "password") {
+            if (value && !passwordRegex.test(value)) {
+                setPasswordError("8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.");
+            } else {
+                setPasswordError("");
+            }
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -71,6 +83,14 @@ function EmployeeEdit() {
 
     const handleSubmit = (e) => {
         if (e) e.preventDefault();
+
+
+
+        // 최종 유효성 검사
+        if (formData.password && !passwordRegex.test(formData.password)) {
+            alert("비밀번호 형식이 올바르지 않습니다.");
+            return; // 함수 종료 (서버 전송 중단)
+        }
         updateEmployee({
             id: employeeId,
             departmentId: formData.departmentId,
@@ -168,6 +188,7 @@ function EmployeeEdit() {
                                                     name="password"
                                                     value={formData.password}
                                                     onChange={handleChange}
+                                                    placeholder="새 비밀번호 (8자 이상, 영문/숫자/특수문자)"
                                                 />
                                                 <button className="password-toggle" type="button">
                                                     <span
@@ -399,7 +420,7 @@ function EmployeeEdit() {
                                     <div className="card-header">
                                         <h3 className="card-title">
                                             <span className="material-symbols-outlined">event_available</span>
-                                            최근 휴가 신청 내역
+                                            최근 휴가 내역
                                         </h3>
                                     </div>
 
