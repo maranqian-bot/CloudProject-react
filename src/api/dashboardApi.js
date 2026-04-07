@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-export const getDashboardSummary = async () => {
+export const getDashboardData = async () => {
     const [summaryResponse, currentEmployeeResponse, vacationRequestsResponse] =
         await Promise.all([
             axiosInstance.get("/summary"),
@@ -54,7 +54,7 @@ export const getRecentActivities = async ({ page, limit }) => {
     };
 };
 
-export const checkIn = async ({
+export const checkInAttendance = async ({
     historyId,
     workDate,
     checkInTime,
@@ -81,7 +81,7 @@ export const checkIn = async ({
     return response.data;
 };
 
-export const checkOut = async ({
+export const checkOutAttendance = async ({
     historyId,
     checkOutTime,
     workMinutes,
