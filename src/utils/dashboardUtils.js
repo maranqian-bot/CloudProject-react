@@ -74,6 +74,20 @@ export const getAttendanceStatusClass = (status) => {
     return statusClassMap[status] ?? "badge";
 };
 
+export const formatVacationDays = (days) => {
+    const safeDays = Number(days ?? 0);
+
+    if (Number.isNaN(safeDays)) {
+        return "0";
+    }
+
+    if (Number.isInteger(safeDays)) {
+        return String(safeDays);
+    }
+
+    return safeDays.toFixed(1);
+};
+
 export const getAttendanceActionState = (attendanceInfo) => {
     const hasCheckIn = Boolean(attendanceInfo?.checkInTime);
     const hasCheckOut = Boolean(attendanceInfo?.checkOutTime);
