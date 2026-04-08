@@ -5,9 +5,18 @@ import pageCss from "../styles/dashboard.css?inline";
 import employeeQuery from "../query/employeeQuery.js";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useEffect } from "react";
+import { getemployeeStatusApi } from "../api/employeesApi.js";
 
 function EmployeeManagement() {
     const navigate = useNavigate();
+
+    // (직원 통계)
+    const [empStats, setEmpStats] = useState(null);
+
+    useEffect(() => {
+        getemployeeStatusApi().then(data => setEmpStats(data))
+    }, [])
 
     // 1. 검색 입력을 위한 로컬 상태 (UI 전용)
     const [inputValue, setInputValue] = useState("");
@@ -92,12 +101,21 @@ function EmployeeManagement() {
 
                     <div className="stats-grid">
                         <div className="stat-card primary">
-                            <p className="stat-label">총 인원</p>
-                            <p className="stat-value">{totalCount.toLocaleString()}</p>
+                            <p className="stat-label">총 정규직</p>
+                            <p className="stat-value">{empStats ? empStats.regularCount : "-"}</p>
                         </div>
-                        <div className="stat-card secondary"><p className="stat-label">계약직</p><p className="stat-value">156</p></div>
-                        <div className="stat-card tertiary"><p className="stat-label">평균 근속</p><p className="stat-value">4.2 <span className="stat-unit">년</span></p></div>
-                        <div className="stat-card success"><p className="stat-label">성장률</p><p className="stat-value">+12.4%</p></div>
+                        <div className="stat-card secondary">
+                            <p className="stat-label">계약직</p>
+                            <p className="stat-value">{empStats ?  empStats.contractCount : "-"}</p>
+                        </div>
+                        <div className="stat-card tertiary">
+                            <p className="stat-label">평균 근속</p>
+                            <p className="stat-value">{empStats ? empStats.avgWorkingYears : "-"}</p>
+                        </div>
+                        <div className="stat-card success">
+                            <p className="stat-label">성장률</p>
+                            <p className="stat-value">{empStats ? empStats.growthRate : "-"}</p>
+                        </div>
                     </div>
 
                     {/* 검색 바 영역 */}
