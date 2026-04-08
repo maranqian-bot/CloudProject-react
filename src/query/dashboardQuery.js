@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    checkInAttendance,
-    checkOutAttendance,
-    getDashboardData,
+    checkIn as checkInAttendance,
+    checkOut as checkOutAttendance,
+    getDashboardSummary as getDashboardData,
 } from "../api/dashboardApi";
 
 export const DASHBOARD_QUERY_KEYS = {
