@@ -69,7 +69,7 @@ function DepartmentEdit() {
                             <th>성명</th>
                             <th>직책</th>
                             <th>이메일</th>
-                            <th>입사일</th>
+                            {/*<th>입사일</th>  -> 데이터 추가시 수정예정 */}
                         </tr>
                         </thead>
                         <tbody>
@@ -97,8 +97,8 @@ function DepartmentEdit() {
                                     </td>
                                     <td>{member.email}</td>
                                     {/* 이메일 */}
-                                    <td>{member.hireDate}</td>
-                                    {/* 입사일 */}
+                                    {/*<td>{member.hireDate}</td>*/}
+                                    {/*/!* 입사일 *!/*/}
                                 </tr>))) : (<tr>
                                 <td colSpan="5" style={{textAlign: "center", padding: "40px"}}>
                                     현재 소속된 부서원이 없습니다.
