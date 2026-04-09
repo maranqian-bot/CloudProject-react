@@ -8,6 +8,12 @@
         const response = await axiosInstance.get("/api/employees",{params});
         return response.data; // data -> content 안쪽의 내용... 스프링에서 보낸 page객체가 들어감
     }
+
+    // 직원 통계
+    export const getemployeeStatusApi = async () => {
+        const response = await axiosInstance.get("/api/employees/stats");
+        return response.data;
+    }
         
     // 게시하기     : axios.get() 매개변수로, 1.경로, 2.데이터객체를 보냄.  
     export const postEmployeesApi = async(reqDto) => {
@@ -19,7 +25,7 @@
     export const putEmployeesApi = async(id, departmentId, reqDto) => {
         const response = await axiosInstance.put(
             `/api/employees/${id}?departmentId=${departmentId}`,
-             reqDto);
+            reqDto);
         return response.data;       
     }
 
