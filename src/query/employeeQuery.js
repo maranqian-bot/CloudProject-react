@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, keepPreviousData, useMutation, useQueryClient} from "@tanstack/react-query";
 import { getEmployeesApi } from "../api/employeesApi";
 
-    const employeeQuery = () => {
+    const employeeQuery = (departmentId = null) => {
 
     // 페이지 상태 선언부
     const [page, setPage] = useState(0);
@@ -10,14 +10,26 @@ import { getEmployeesApi } from "../api/employeesApi";
     const pagesPerGroup = 3;
 
     const { data, isLoading, isError } = useQuery({
-        queryKey: ["employee", page],
+        queryKey: ["employee", departmentId, page],
 
         queryFn: () => {
-            console.log("호출시도");
-            return getEmployeesApi({ page, size: itemsPerPage })
+            // 서버로 보낼 파라미터 객체 만들기
+            const params = {
+                page,
+                size: itemsPerPage
+            };
+
+            // 부서 ID가 있을 때만 파라미터에 추가 (전체 목록 페이지 배려)
+            if (departmentId) {
+                params.departmentId = departmentId;
+            }
+
+            console.log("호출 시도 - 파라미터:", params);
+            return getEmployeesApi(params);  // 수정한 params를 전달!
         },
         placeholderData: keepPreviousData,
-
+        // 부서ID가 없어도(전체 조회) 실행되도록 조건 제거 혹은 수정 (방어로직)
+        enabled: true
     });
 
     // 직원수정 기능 (기존값 바뀔 때마다 갱신)
