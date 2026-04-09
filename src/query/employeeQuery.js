@@ -1,100 +1,114 @@
-import { useState, useMemo } from "react";
-import { useQuery, keepPreviousData, useMutation, useQueryClient} from "@tanstack/react-query";
-import { getEmployeesApi } from "../api/employeesApi";
+import {useCallback, useMemo, useState} from "react";
+import {keepPreviousData, useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {getEmployeeDetail, getEmployeesApi, putEmployeesApi} from "../api/employeesApi";
+import {useNavigate} from "react-router-dom";
 
-    const employeeQuery = (departmentId = null) => {
+const employeeQuery = (id = null, departmentId = null) => {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    // 페이지 상태 선언부
     const [page, setPage] = useState(0);
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [selectedDeptName, setSelectedDeptName] = useState("");
     const itemsPerPage = 5;
     const pagesPerGroup = 3;
 
-    const { data, isLoading, isError } = useQuery({
-        queryKey: ["employee", departmentId, page],
-
-        queryFn: () => {
-            // 서버로 보낼 파라미터 객체 만들기
-            const params = {
-                page,
-                size: itemsPerPage
-            };
-
-            // 부서 ID가 있을 때만 파라미터에 추가 (전체 목록 페이지 배려)
-            if (departmentId) {
-                params.departmentId = departmentId;
-            }
-
-            console.log("호출 시도 - 파라미터:", params);
-            return getEmployeesApi(params);  // 수정한 params를 전달!
-        },
+    // 1. 목록 조회 (id가 없을 때만 실행)  -> 부서Id 추가
+    const listQuery = useQuery({
+        queryKey: ["employee", "list", page, searchKeyword, selectedDeptName, departmentId],
+        queryFn: () => getEmployeesApi({ page, size: itemsPerPage, keyword: searchKeyword, department: selectedDeptName, departmentId: departmentId }),
         placeholderData: keepPreviousData,
-        // 부서ID가 없어도(전체 조회) 실행되도록 조건 제거 혹은 수정 (방어로직)
-        enabled: true
+        enabled: !id
     });
 
-    // 직원수정 기능 (기존값 바뀔 때마다 갱신)
+    // 2. 상세 정보 조회 (id가 있을 때만 실행)
+    const detailQuery = useQuery({
+        queryKey: ["employee", "detail", id],
+        queryFn: () => getEmployeeDetail(id),
+        enabled: !!id,
+        staleTime: 0
+    });
+
+    // 3. 수정 기능
     const mutation = useMutation({
-        // 아이디의 객체 바뀌면 -> 값 갱신해주는 메서드 호출 : putEmployeesApi
-        mutationFn : ({id , reqDto}) => {putEmployeesApi(id, reqDto)}, 
-        onSuccess : () => {     //  기존 내용물 버리고 새로 채우기
-            queryClient.invalidateQueries({queryKey : ["employee"]});
+        mutationFn: ({ id, departmentId, reqDto }) => putEmployeesApi(id, departmentId, reqDto),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["employee"] });
             alert("수정되었습니다!");
-        },   
-        onError : (error) => {  //  실행 안됐을 떄의 에러
-            console.log(error, "수정중 에러가 발생했습니다.");
-            alert("에러발생!");
-        }       
+            navigate("/employee-management");
+        },
+        onError: (error) => { console.error(error); alert("에러 발생!"); }
     });
 
-    // 페이징 처리
-    const totalCount = data?.totalElements || 0;
-    const totalPages = data?.totalPages || 0;
+    // 4. [수정됨] 페이징 계산 로직 (목록/상세 대응)
+    // 상세 페이지(id 존재)일 경우 상세 데이터 내 리스트 길이를 기준으로 계산
+    const totalCount = id
+        ? (detailQuery.data?.attendanceHistory?.length || 0)
+        : (listQuery.data?.totalElements || 0);
+
+    const totalPages = id
+        ? Math.ceil(totalCount / itemsPerPage)
+        : (listQuery.data?.totalPages || 0);
+
     const currentPageUI = page + 1;
 
-    const currentGroup = Math.ceil(currentPageUI / pagesPerGroup);
-    const startPage = (currentGroup - 1) * pagesPerGroup + 1;
-    const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
+    // 페이지 번호 그룹 계산
+    const pageNumbers = useMemo(() => {
+        const currentGroup = Math.ceil(currentPageUI / pagesPerGroup);
+        const startPage = (currentGroup - 1) * pagesPerGroup + 1;
+        const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
 
-    const pageNumbers = [];
-    for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(i);
-    }
+        const nums = [];
+        for (let i = startPage; i <= endPage; i++) { nums.push(i); }
+        return nums;
+    }, [currentPageUI, totalPages]);
 
-    const startItemNumber = totalCount === 0 ? 0 : page * itemsPerPage + 1;
-    const endItemNumber = Math.min((page + 1) * itemsPerPage, totalCount);
+    // 5. [추가] 상세 페이지용 데이터 슬라이싱 (현재 페이지에 보여줄 5개만 추출)
+    const attendanceHistory = useMemo(() => {
+        const fullHistory = detailQuery.data?.attendanceHistory || [];
+        if (!id) return []; // 목록 페이지에선 빈 배열
+        const offset = page * itemsPerPage;
+        return fullHistory.slice(offset, offset + itemsPerPage);
+    }, [detailQuery.data, id, page]);
 
-    // 이동 함수들
-    const changePage = (pageNum) => setPage(pageNum - 1);
-    const goToPrevPage = () => setPage((prev) => Math.max(prev - 1, 0));
-    const goToNextPage = () => setPage((prev) => (prev + 1 < totalPages ? prev + 1 : prev));
+    // 6. 조작 함수 메모이제이션
+    const changePage = useCallback((pageNum) => setPage(pageNum - 1), []);
+    const goToPrevPage = useCallback(() => setPage((prev) => Math.max(prev - 1, 0)), []);
+    const goToNextPage = useCallback(() => setPage((prev) => (prev + 1 < totalPages ? prev + 1 : prev)), [totalPages]);
 
+    const handleSearch = useCallback((keyword, deptName) => {
+        setSearchKeyword(keyword);
+        setSelectedDeptName(deptName);
+        setPage(0);
+    }, []);
 
     return {
+        // 데이터
+        employees: listQuery.data?.content || [],
+        employee: detailQuery.data || null,
 
-        // 1. 데이터 및 기본 상태
-        employee: data?.content || [],
-        loading: isLoading,
-        isError: isError,
-        errorMessage: isError ? "데이터를 불러오는 중 에러가 발생했습니다." : null,
-        pageInfo: data,
+        // 상세 데이터 내부 리스트 (페이징 적용된 결과물)
+        attendanceHistory,
+        pendingVacation: detailQuery.data?.pendingVacation || [],
 
-        // 2. 직원수정 기능 내보내기
-        updateEmployee : mutation.mutate,       // 수정실행 버튼.
-        updatePending : mutation.isPending,     // 내용 업데이트 중일 떄 추가 동작 막는용도
+        loading: listQuery.isLoading || detailQuery.isLoading,
+        isError: listQuery.isError || detailQuery.isError,
 
-        // 3. 페이징 관련 정보 (팀원 형식에 맞춤)
-        currentPage: currentPageUI,      // 현재 페이지 (1부터)
-        totalPages,          // 전체 페이지 수
-        pageNumbers,        // [1, 2, 3] 형태의 배열
-        totalCount,          // 전체 인원수
-        startItemNumber, // 시작 번호
-        endItemNumber,     // 끝 번호
+        // 페이징/검색 상태
+        currentPage: currentPageUI,
+        totalPages,
+        pageNumbers,
+        totalCount,
+        startItemNumber: totalCount === 0 ? 0 : page * itemsPerPage + 1,
+        endItemNumber: Math.min((page + 1) * itemsPerPage, totalCount),
+        handleSearch,
+        changePage,
+        goToPrevPage,
+        goToNextPage,
 
-        // 4. 이동 함수들
-        changePage: changePage,         // 페이지 이동 (클릭)
-        goToPrevPage: goToPrevPage,     // 이전페이지 이동
-        goToNextPage: goToNextPage      // 다음페이지 이동
-
+        // 수정
+        updateEmployee: mutation.mutate,
+        updatePending: mutation.isPending
     };
 };
 

@@ -13,7 +13,7 @@ function DepartmentEdit() {
     console.log("현재 ID 확인:", departmentId);
 
     const {
-        employee,     // 실제 직원 목록 배열
+        employees,     // 실제 직원 목록 배열
         totalCount,      // 전체 인원수
         pageNumbers,     // [1, 2, 3] 형태의 페이지 번호 배열
         currentPage,     // 현재 페이지 번호
@@ -23,7 +23,7 @@ function DepartmentEdit() {
         startItemNumber, // 시작 번호 (예: 1)
         endItemNumber,   // 끝 번호 (예: 5)
         loading          // 로딩 상태
-    } = employeeQuery(departmentId);
+    } = employeeQuery(null, departmentId);
 
 
     const navigate = useNavigate();
@@ -80,9 +80,8 @@ function DepartmentEdit() {
                                     직원 목록을 불러오는 중입니다...
                                 </td>
                             </tr>
-                        ) : employee && employee.length > 0 ? (
-
-                            employee.map((member) => (
+                        ) : employees && employees.length > 0 ? (
+                            employees.map((member) => (
                                 <tr key={member.employeeId}>
 
                                     {/* 사번 -  엔티티 필드명과 일치 확인*/}
