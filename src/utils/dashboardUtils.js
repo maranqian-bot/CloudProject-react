@@ -42,12 +42,6 @@ export const formatDate = (dateValue) => {
     return `${year}.${month}.${day}`;
 };
 
-export const formatVacationDays = (days) => {
-    const safeDays = Number(days ?? 0);
-    if (safeDays <= 0) return "0일";
-    return `${Number.isInteger(safeDays) ? safeDays : safeDays.toFixed(1)}일`;
-};
-
 export const getAttendanceStatusLabel = (status) => {
     const statusMap = {
         NORMAL: "정상",
