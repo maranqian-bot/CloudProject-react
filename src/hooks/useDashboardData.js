@@ -6,7 +6,6 @@ import {
 import {
     DASHBOARD_ITEMS_PER_PAGE,
     DEFAULT_TARGET_WORK_DAYS,
-    getFilledSegmentCount,
     getRecentActivityItems,
     toSafeNumber,
 } from "../utils/dashboardUtils";
@@ -40,20 +39,15 @@ const getUsedVacationDays = ({
         .reduce((acc, item) => acc + toSafeNumber(item.days), 0);
 };
 
-const getVacationProgressPercent = ({
-    remainingVacationDays,
-    usedVacationDays,
-}) => {
-    const totalVacationDays = remainingVacationDays + usedVacationDays;
+const getProgressPercent = ({ value, total }) => {
+    const safeValue = Math.max(0, toSafeNumber(value));
+    const safeTotal = Math.max(0, toSafeNumber(total));
 
-    if (totalVacationDays <= 0) {
+    if (safeTotal <= 0) {
         return 0;
     }
 
-    return Math.min(
-        100,
-        Math.max(0, (remainingVacationDays / totalVacationDays) * 100)
-    );
+    return Math.min(100, (safeValue / safeTotal) * 100);
 };
 
 export const useDashboardData = ({ currentPage, currentYear }) => {
@@ -98,19 +92,22 @@ export const useDashboardData = ({ currentPage, currentYear }) => {
 
     const totalVacationDays = remainingVacationDays + usedVacationDays;
 
-    const vacationProgressPercent = useMemo(() => {
-        return getVacationProgressPercent({
-            remainingVacationDays,
-            usedVacationDays,
+    const usedVacationPercent = useMemo(() => {
+        return getProgressPercent({
+            value: usedVacationDays,
+            total: totalVacationDays,
         });
-    }, [remainingVacationDays, usedVacationDays]);
+    }, [usedVacationDays, totalVacationDays]);
 
     const activities = useMemo(() => {
         return getRecentActivityItems(recentActivitiesData.items);
     }, [recentActivitiesData.items]);
 
-    const filledSegmentCount = useMemo(() => {
-        return getFilledSegmentCount(workedDays, targetWorkDays);
+    const workedDaysPercent = useMemo(() => {
+        return getProgressPercent({
+            value: workedDays,
+            total: targetWorkDays,
+        });
     }, [workedDays, targetWorkDays]);
 
     return {
@@ -120,10 +117,10 @@ export const useDashboardData = ({ currentPage, currentYear }) => {
         remainingVacationDays,
         usedVacationDays,
         totalVacationDays,
-        vacationProgressPercent,
+        usedVacationPercent,
         workedDays,
         targetWorkDays,
-        filledSegmentCount,
+        workedDaysPercent,
         activities,
         totalCount: recentActivitiesData.totalCount,
         isRecentActivitiesLoading,

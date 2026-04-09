@@ -1,6 +1,9 @@
 import { formatVacationDays } from "../../utils/dashboardUtils";
 
-function DashboardVacationCard({ remainingVacationDays, progressPercent }) {
+function DashboardVacationCard({
+    remainingVacationDays,
+    usedVacationPercent,
+}) {
     return (
         <div className="card stat-card">
             <div className="stat-header">
@@ -29,7 +32,7 @@ function DashboardVacationCard({ remainingVacationDays, progressPercent }) {
             <div className="stat-bar">
                 <div
                     className="stat-progress"
-                    style={{ width: `${progressPercent}%` }}
+                    style={{ width: `${usedVacationPercent}%` }}
                 />
             </div>
         </div>
