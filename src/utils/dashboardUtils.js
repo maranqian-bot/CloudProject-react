@@ -2,6 +2,15 @@ export const DEFAULT_TARGET_WORK_DAYS = 22;
 export const DASHBOARD_ITEMS_PER_PAGE = 5;
 export const DASHBOARD_SEGMENT_COUNT = 4;
 
+export const ATTENDANCE_STATUS = {
+    NORMAL: "NORMAL",
+    LATE: "LATE",
+    EARLY_LEAVE: "EARLY_LEAVE",
+    OVER_TIME: "OVER_TIME",
+    ABSENT: "ABSENT",
+    VACATION: "VACATION",
+};
+
 export const formatWorkMinutesToHourMinute = (minutes) => {
     const safeMinutes = Number(minutes ?? 0);
 
@@ -18,7 +27,21 @@ export const formatWorkMinutesToHourMinute = (minutes) => {
 export const formatTime = (dateTime) => {
     if (!dateTime) return "-";
 
+    if (typeof dateTime === "string") {
+        const timeOnlyMatch = dateTime.match(/^(\d{2}):(\d{2})(?::\d{2})?$/);
+
+        if (timeOnlyMatch) {
+            const hour = Number(timeOnlyMatch[1]);
+            const minute = timeOnlyMatch[2];
+            const meridiem = hour < 12 ? "오전" : "오후";
+            const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+
+            return `${meridiem} ${displayHour}:${minute}`;
+        }
+    }
+
     const date = new Date(dateTime);
+
     if (Number.isNaN(date.getTime())) return "-";
 
     const hour = date.getHours();
@@ -47,7 +70,7 @@ export const getAttendanceStatusLabel = (status) => {
         NORMAL: "정상",
         LATE: "지각",
         EARLY_LEAVE: "조퇴",
-        OVERTIME: "연장 근무",
+        OVER_TIME: "연장 근무",
         ABSENT: "결근",
         VACATION: "휴가",
     };
@@ -128,4 +151,57 @@ export const buildDashboardSegments = ({
             filled,
         };
     });
+};
+
+export const formatDateToKey = (dateValue) => {
+    if (!dateValue) return null;
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return null;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+export const formatTimeToKey = (dateValue) => {
+    if (!dateValue) return null;
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return null;
+
+    const hour = String(date.getHours()).padStart(2, "0");
+    const minute = String(date.getMinutes()).padStart(2, "0");
+
+    return `${hour}:${minute}`;
+};
+
+export const getMinutesFromTime = (timeValue) => {
+    if (!timeValue || typeof timeValue !== "string") {
+        return 0;
+    }
+
+    const [hour, minute] = timeValue.split(":").map(Number);
+
+    if (Number.isNaN(hour) || Number.isNaN(minute)) {
+        return 0;
+    }
+
+    return hour * 60 + minute;
+};
+
+export const getAttendanceStatusByWorkMinutes = (workMinutes) => {
+    const safeMinutes = Number(workMinutes ?? 0);
+
+    if (safeMinutes >= 600) {
+        return ATTENDANCE_STATUS.OVER_TIME;
+    }
+
+    if (safeMinutes < 480) {
+        return ATTENDANCE_STATUS.EARLY_LEAVE;
+    }
+
+    return ATTENDANCE_STATUS.NORMAL;
 };

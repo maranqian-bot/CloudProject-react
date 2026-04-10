@@ -1,8 +1,9 @@
 import {
-    useCheckInMutation,
-    useCheckOutMutation,
+    useCheckInAttendanceMutation,
+    useCheckOutAttendanceMutation,
     useTodayAttendanceQuery,
 } from "../query/dashboardQuery";
+
 import {
     ATTENDANCE_STATUS,
     formatDateToKey,
@@ -26,17 +27,23 @@ export const useAttendance = ({ currentDate }) => {
         },
     } = useTodayAttendanceQuery({ workDate });
 
-    const checkInMutation = useCheckInMutation();
-    const checkOutMutation = useCheckOutMutation();
+    const checkInMutation = useCheckInAttendanceMutation();
+    const checkOutMutation = useCheckOutAttendanceMutation();
 
-    const isCheckedIn = Boolean(todayAttendanceData.isCheckedIn);
-    const isCheckedOut = Boolean(todayAttendanceData.isCheckedOut);
+    const isCheckedIn = !!todayAttendanceData.checkInTime;
+    const isCheckedOut = !!todayAttendanceData.checkOutTime;    
 
-    const attendanceStatusLabel = getAttendanceStatusLabel({
-        isCheckedIn,
-        isCheckedOut,
-    });
+    let attendanceStatus;
 
+    if (!isCheckedIn && !isCheckedOut) {
+        attendanceStatus = null;
+    } else if (isCheckedIn && !isCheckedOut) {
+        attendanceStatus = ATTENDANCE_STATUS.NORMAL;
+    } else {
+        attendanceStatus = ATTENDANCE_STATUS.OVER_TIME;
+    }
+
+    const attendanceStatusLabel = getAttendanceStatusLabel(attendanceStatus);
     const isCheckInDisabled = isCheckedIn;
     const isCheckOutDisabled = !isCheckedIn || isCheckedOut;
 

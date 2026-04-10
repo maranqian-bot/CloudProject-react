@@ -1,98 +1,63 @@
 import axiosInstance from "./axiosInstance";
 
 export const getDashboardSummary = async () => {
-    const [summaryResponse, currentEmployeeResponse, vacationRequestsResponse] =
-        await Promise.all([
-            axiosInstance.get("/summary"),
-            axiosInstance.get("/currentEmployee"),
-            axiosInstance.get("/vacationRequests"),
-        ]);
+    const response = await axiosInstance.get("/api/dashboard");
+
+    const data = response.data?.data ?? {};
 
     return {
-        summary: summaryResponse.data?.[0] ?? {},
-        currentEmployee: currentEmployeeResponse.data ?? {},
-        vacationRequests: vacationRequestsResponse.data ?? [],
+        summary: data.summary ?? {},
+        currentEmployee: data.currentEmployee ?? {},
+        vacationRequests: data.vacationRequests ?? [],
     };
 };
 
-export const getTodayHistory = async ({ workDate }) => {
-    const response = await axiosInstance.get("/history", {
-        params: {
-            workDate,
-        },
-    });
+export const getTodayAttendance = async () => {
+    const response = await axiosInstance.get("/api/dashboard/attendance/today");
 
-    return response.data?.[0] ?? null;
-};
-
-export const getTodayAttendance = async ({ workDate }) => {
-    const todayHistory = await getTodayHistory({ workDate });
-
-    return {
-        workDate,
-        isCheckedIn: Boolean(todayHistory?.checkInTime),
-        isCheckedOut: Boolean(todayHistory?.checkOutTime),
-        checkInTime: todayHistory?.checkInTime ?? null,
-        checkOutTime: todayHistory?.checkOutTime ?? null,
-        historyId: todayHistory?.id ?? null,
+    return response.data?.data ?? {
+        workDate: null,
+        isCheckedIn: false,
+        isCheckedOut: false,
+        checkInTime: null,
+        checkOutTime: null,
+        historyId: null,
     };
 };
 
 export const getRecentActivities = async ({ page, limit }) => {
-    const response = await axiosInstance.get("/history", {
+    const response = await axiosInstance.get("/api/dashboard/attendance/history", {
         params: {
-            _sort: "workDate",
-            _order: "desc",
-            _page: page,
-            _limit: limit,
+            page,
+            size: limit,
         },
     });
 
+    const data = response.data?.data ?? {};
+
     return {
-        items: response.data ?? [],
-        totalCount: Number(response.headers["x-total-count"] ?? 0),
+        items: data.items ?? [],
+        totalCount: Number(data.totalCount ?? 0),
+        currentPage: Number(data.currentPage ?? page ?? 1),
+        totalPages: Number(data.totalPages ?? 0),
+        pageSize: Number(data.pageSize ?? limit ?? 5),
     };
 };
 
-export const checkIn = async ({
-    historyId,
-    workDate,
-    checkInTime,
-    attendanceStatus,
-}) => {
-    if (historyId) {
-        const response = await axiosInstance.patch(`/history/${historyId}`, {
-            // 출근 시간 반영
-            checkInTime,
-            attendanceStatus,
-        });
+export const checkIn = async () => {
+    const response = await axiosInstance.post("/api/dashboard/attendance/check-in");
 
-        return response.data;
-    }
-
-    const response = await axiosInstance.post("/history", {
-        workDate,
-        checkInTime,
-        checkOutTime: null,
-        workMinutes: null,
-        attendanceStatus,
-    });
-
-    return response.data;
+    return response.data?.data ?? null;
 };
 
-export const checkOut = async ({
-    historyId,
-    checkOutTime,
-    workMinutes,
-    attendanceStatus,
-}) => {
-    const response = await axiosInstance.patch(`/history/${historyId}`, {
-        // 퇴근 처리 데이터 반영
-        checkOutTime,
-        workMinutes,
-        attendanceStatus,
-    });
+export const checkOut = async ({ historyId }) => {
+    if (!historyId) {
+        throw new Error("historyId is required for checkOut");
+    }
 
-    return response.data;
+    const response = await axiosInstance.patch(
+        `/api/dashboard/attendance/${historyId}/check-out`
+    );
+
+    return response.data?.data ?? null;
 };
