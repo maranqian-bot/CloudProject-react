@@ -63,9 +63,6 @@ function EmployeeCreate() {
         });
     };
 
-
-
-
     return (
         <>
             <Sidebar />

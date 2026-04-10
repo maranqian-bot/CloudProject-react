@@ -1,24 +1,24 @@
-import { useState, useCallback, useMemo } from "react";
-import { useQuery, keepPreviousData, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getEmployeesApi, getEmployeeDetail, putEmployeesApi } from "../api/employeesApi";
-import { useNavigate } from "react-router-dom";
+import {useCallback, useMemo, useState} from "react";
+import {keepPreviousData, useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {getEmployeeDetail, getEmployeesApi, putEmployeesApi} from "../api/employeesApi";
+import {useNavigate} from "react-router-dom";
 
-const employeeQuery = (id = null) => {
+const employeeQuery = (id = null, departmentId = null) => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const [page, setPage] = useState(0);
-    const [searchKeyword, setSearchKeyword] = useState(""); 
-    const [selectedDeptName, setSelectedDeptName] = useState(""); 
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [selectedDeptName, setSelectedDeptName] = useState("");
     const itemsPerPage = 5;
     const pagesPerGroup = 3;
 
-    // 1. 목록 조회 (id가 없을 때만 실행)
+    // 1. 목록 조회 (id가 없을 때만 실행)  -> 부서Id 추가
     const listQuery = useQuery({
-        queryKey: ["employee", "list", page, searchKeyword, selectedDeptName],
-        queryFn: () => getEmployeesApi({ page, size: itemsPerPage, keyword: searchKeyword, department: selectedDeptName }),
+        queryKey: ["employee", "list", page, searchKeyword, selectedDeptName, departmentId],
+        queryFn: () => getEmployeesApi({ page, size: itemsPerPage, keyword: searchKeyword, department: selectedDeptName, departmentId: departmentId }),
         placeholderData: keepPreviousData,
-        enabled: !id 
+        enabled: !id
     });
 
     // 2. 상세 정보 조회 (id가 있을 때만 실행)
@@ -26,7 +26,7 @@ const employeeQuery = (id = null) => {
         queryKey: ["employee", "detail", id],
         queryFn: () => getEmployeeDetail(id),
         enabled: !!id,
-        staleTime: 0 
+        staleTime: 0
     });
 
     // 3. 수정 기능
@@ -42,12 +42,12 @@ const employeeQuery = (id = null) => {
 
     // 4. [수정됨] 페이징 계산 로직 (목록/상세 대응)
     // 상세 페이지(id 존재)일 경우 상세 데이터 내 리스트 길이를 기준으로 계산
-    const totalCount = id 
-        ? (detailQuery.data?.attendanceHistory?.length || 0) 
+    const totalCount = id
+        ? (detailQuery.data?.attendanceHistory?.length || 0)
         : (listQuery.data?.totalElements || 0);
 
-    const totalPages = id 
-        ? Math.ceil(totalCount / itemsPerPage) 
+    const totalPages = id
+        ? Math.ceil(totalCount / itemsPerPage)
         : (listQuery.data?.totalPages || 0);
 
     const currentPageUI = page + 1;
@@ -57,7 +57,7 @@ const employeeQuery = (id = null) => {
         const currentGroup = Math.ceil(currentPageUI / pagesPerGroup);
         const startPage = (currentGroup - 1) * pagesPerGroup + 1;
         const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
-        
+
         const nums = [];
         for (let i = startPage; i <= endPage; i++) { nums.push(i); }
         return nums;
@@ -75,7 +75,7 @@ const employeeQuery = (id = null) => {
     const changePage = useCallback((pageNum) => setPage(pageNum - 1), []);
     const goToPrevPage = useCallback(() => setPage((prev) => Math.max(prev - 1, 0)), []);
     const goToNextPage = useCallback(() => setPage((prev) => (prev + 1 < totalPages ? prev + 1 : prev)), [totalPages]);
-    
+
     const handleSearch = useCallback((keyword, deptName) => {
         setSearchKeyword(keyword);
         setSelectedDeptName(deptName);
@@ -84,9 +84,9 @@ const employeeQuery = (id = null) => {
 
     return {
         // 데이터
-        employees: listQuery.data?.content || [], 
-        employee: detailQuery.data || null,       
-        
+        employees: listQuery.data?.content || [],
+        employee: detailQuery.data || null,
+
         // 상세 데이터 내부 리스트 (페이징 적용된 결과물)
         attendanceHistory,
         pendingVacation: detailQuery.data?.pendingVacation || [],
