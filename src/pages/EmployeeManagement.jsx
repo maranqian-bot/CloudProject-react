@@ -18,10 +18,11 @@ function EmployeeManagement() {
         getemployeeStatusApi().then(data => setEmpStats(data))
     }, [])
 
-    // 1. 검색 입력을 위한 로컬 상태 (UI 전용)
-    const [inputValue, setInputValue] = useState("");
-    const [selectedDept, setSelectedDept] = useState("");
-
+    // 1. 검색d
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [selectedDeptName, setSelectedDeptName] = useState("");
+    const [selectedStatus, setSelectedStatus ]= useState("");
+    
     const {
         employees,
         loading,
@@ -39,7 +40,7 @@ function EmployeeManagement() {
 
     // 2. 검색 실행 핸들러
     const onSearch = () => {
-        handleSearch(inputValue, selectedDept);
+        handleSearch(searchKeyword, selectedDeptName, selectedStatus);
     };
 
     // 3. 엔터키 지원
@@ -61,7 +62,7 @@ function EmployeeManagement() {
                 <td>{emp.departmentName || "소속없음"}</td>
                 <td>
                     <span className={`status-badge ${emp.status?.toLowerCase()}`}>
-                        {emp.status === 'ACTIVE' ? '활성' : '비활성'}
+                        {emp.status === "ACTIVE" ? '활성' : '비활성'}
                     </span>
                 </td>
                 <td style={{ textAlign: "right", paddingRight: "20px" }}>
@@ -125,21 +126,32 @@ function EmployeeManagement() {
                             <input 
                                 placeholder="직원 이름 또는 ID로 검색..." 
                                 type="text" 
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
+                                value={searchKeyword}
+                                onChange={(e) => setSearchKeyword(e.target.value)}
                                 onKeyDown={onKeyDown}
                             />
                         </div>
                         <div className="select-container">
                             <select 
-                                value={selectedDept} 
-                                onChange={(e) => setSelectedDept(e.target.value)}
+                                value={selectedDeptName} 
+                                onChange={(e) => setSelectedDeptName(e.target.value)}
                             >
                                 <option value="">모든 부서</option>
                                 <option value="인사부 (HR)">인사부 (HR)</option>
                                 <option value="엔지니어링">엔지니어링</option>
                                 <option value="영업부">영업부</option>
                                 <option value="디자인">디자인</option>
+                            </select>
+                        </div>
+                        <div className ="select-container">
+                            <select
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
+                            >
+                                <option value = "">상태: 전체</option>
+                                <option value = "ACTIVE">활성</option>
+                                <option value = "UNACTIVE">비활성</option>
+
                             </select>
                         </div>
                         <button className="filter-btn" onClick={onSearch}>검색</button>
